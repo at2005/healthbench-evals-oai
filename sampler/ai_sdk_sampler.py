@@ -21,7 +21,7 @@ class AISDKSampler(SamplerBase):
         system_message: str | None = None,
         temperature: float = 1,
         max_tokens: int = 1024,
-        api_url: str = "http://localhost:3000/api/eval",
+        api_url: str = "http://localhost:3000/api/chat-buffer",
     ):
         self.api_url = api_url
         self.model = model
