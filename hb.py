@@ -53,7 +53,7 @@ def main():
     parser.add_argument(
         "--api_url",
         type=str,
-        default="http://localhost:3000/api/eval",
+        default="http://localhost:3000/api/chat-buffer",
         help="API URL for AI SDK sampler",
     )
     args = parser.parse_args()
