@@ -10,7 +10,8 @@ import numpy as np
 import requests
 from tqdm import tqdm
 
-from .eval_types import EvalResult, Message, SamplerBase, SingleEvalResult
+import eval_types
+from eval_types import EvalResult, Message, SamplerBase, SingleEvalResult
 
 QUERY_TEMPLATE_MULTICHOICE = """
 Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of ABCD. Think step by step before answering.

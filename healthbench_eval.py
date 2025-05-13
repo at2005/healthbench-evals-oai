@@ -18,6 +18,7 @@ import argparse
 import copy
 import hashlib
 import json
+import os
 import random
 import re
 from collections import defaultdict
@@ -29,12 +30,12 @@ import blobfile as bf
 import numpy as np
 import pandas as pd
 
-from . import common
-from .sampler.chat_completion_sampler import (
+import common
+from sampler.chat_completion_sampler import (
     OPENAI_SYSTEM_MESSAGE_API,
     ChatCompletionSampler,
 )
-from .eval_types import Eval, EvalResult, MessageList, SamplerBase, SingleEvalResult
+from eval_types import Eval, EvalResult, MessageList, SamplerBase, SingleEvalResult
 
 INPUT_PATH = "https://openaipublic.blob.core.windows.net/simple-evals/healthbench/2025-05-07-06-14-12_oss_eval.jsonl"
 INPUT_PATH_HARD = "https://openaipublic.blob.core.windows.net/simple-evals/healthbench/hard_2025-05-08-21-00-10.jsonl"
@@ -582,20 +583,35 @@ def run_custom_eval(
     now = datetime.now()
     date_str = now.strftime("%Y%m%d_%H%M")
 
+    # Create results directory if it doesn't exist
+    results_dir = Path("results")
+    results_dir.mkdir(exist_ok=True)
+
     grading_sampler = ChatCompletionSampler(
         model="gpt-4.1-2025-04-14",
         system_message=OPENAI_SYSTEM_MESSAGE_API,
         max_tokens=2048,
     )
 
-    # Get model from user input
-    model_name = input("Enter model name to evaluate (e.g., gpt-4.1-2025-04-14): ")
-    sampler = ChatCompletionSampler(
-        model=model_name,
-        system_message=OPENAI_SYSTEM_MESSAGE_API,
-        max_tokens=2048,
-    )
-
+    # Check if AI SDK environment variables are set
+    if os.environ.get("AI_SDK_MODEL"):
+        from sampler.ai_sdk_sampler import AISDKSampler
+        print("Using AI SDK sampler with configuration from environment variables")
+        sampler = AISDKSampler(
+            model=os.environ.get("AI_SDK_MODEL", "gpt-4.1"),
+            temperature=float(os.environ.get("AI_SDK_TEMPERATURE", "1.0")),
+            max_tokens=int(os.environ.get("AI_SDK_MAX_TOKENS", "1024")),
+            api_url=os.environ.get("AI_SDK_API_URL", "http://localhost:3000/api/eval"),
+        )
+    else:
+        # Get model from user input
+        model_name = input("Enter model name to evaluate (e.g., gpt-4.1-2025-04-14): ")
+        sampler = ChatCompletionSampler(
+            model=model_name,
+            system_message=OPENAI_SYSTEM_MESSAGE_API,
+            max_tokens=2048,
+        )
+        
     # Run eval
     eval = HealthBenchEval(
         grader_model=grading_sampler,
@@ -607,14 +623,14 @@ def run_custom_eval(
 
     # Report
     file_stem = f"healthbench_custom_{Path(custom_input_path).stem}_{date_str}"
-    report_filename = Path(f"/tmp/{file_stem}.html")
+    report_filename = results_dir / f"{file_stem}.html"
     report_filename.write_text(common.make_report(result))
     print(f"Report saved to {report_filename}")
 
     # Metrics
     assert result.metrics is not None
     metrics = result.metrics
-    result_filename = Path(f"/tmp/{file_stem}.json")
+    result_filename = results_dir / f"{file_stem}.json"
     result_filename.write_text(json.dumps(metrics))
     print(f"Results saved to {result_filename}")
 
@@ -625,7 +641,7 @@ def run_custom_eval(
         "convos": result.convos,
         "metadata": result.metadata,
     }
-    full_result_filename = Path(f"/tmp/{file_stem}_allresults.json")
+    full_result_filename = results_dir / f"{file_stem}_allresults.json"
     full_result_filename.write_text(json.dumps(full_result_dict, indent=2))
     print(f"All results saved to {full_result_filename}")
 
@@ -641,6 +657,10 @@ def physician_completions_main(
 ):
     now = datetime.now()
     date_str = now.strftime("%Y%m%d_%H%M")
+    
+    # Create results directory if it doesn't exist
+    results_dir = Path("results")
+    results_dir.mkdir(exist_ok=True)
 
     grading_sampler = ChatCompletionSampler(
         model="gpt-4.1-2025-04-14",
@@ -674,14 +694,14 @@ def physician_completions_main(
             file_stem = f"healthbench_{parsable_mode}_referencecompletions_{date_str}"
         else:
             file_stem = f"healthbench_{parsable_mode}_humanbaseline_{date_str}"
-        report_filename = Path(f"/tmp/{file_stem}.html")
+        report_filename = results_dir / f"{file_stem}.html"
         report_filename.write_text(common.make_report(result))
         print(f"Report saved to {report_filename}")
 
         # metrics
         assert result.metrics is not None
         metrics = result.metrics
-        result_filename = Path(f"/tmp/{file_stem}.json")
+        result_filename = results_dir / f"{file_stem}.json"
         result_filename.write_text(json.dumps(metrics))
         print(f"Results saved to {result_filename}")
 
@@ -692,7 +712,7 @@ def physician_completions_main(
             "convos": result.convos,
             "metadata": result.metadata,
         }
-        full_result_filename = Path(f"/tmp/{file_stem}_allresults.json")
+        full_result_filename = results_dir / f"{file_stem}_allresults.json"
         full_result_filename.write_text(json.dumps(full_result_dict, indent=2))
         print(f"All results saved to {full_result_filename}")
 

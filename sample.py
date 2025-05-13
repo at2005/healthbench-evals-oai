@@ -70,11 +70,20 @@ def sample_by_theme_category(input_file, output_file, samples_per_combo=3):
         print(f"{combo}: {len(entries)} entries, sampled {min(samples_per_combo, len(entries))}")
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print(f"Usage: {sys.argv[0]} <input_jsonl> <output_jsonl>")
+    if len(sys.argv) not in [3, 4]:
+        print(f"Usage: {sys.argv[0]} <input_jsonl> <output_jsonl> [samples_per_combo]")
         sys.exit(1)
     
     input_file = sys.argv[1]
     output_file = sys.argv[2]
     
-    sample_by_theme_category(input_file, output_file) 
+    # Use provided samples_per_combo if given, otherwise default to 3
+    samples_per_combo = 3
+    if len(sys.argv) == 4:
+        try:
+            samples_per_combo = int(sys.argv[3])
+        except ValueError:
+            print("Error: samples_per_combo must be an integer")
+            sys.exit(1)
+    
+    sample_by_theme_category(input_file, output_file, samples_per_combo) 

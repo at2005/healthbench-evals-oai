@@ -4,7 +4,10 @@ from typing import Any
 import openai
 from openai import OpenAI
 
-from ..eval_types import MessageList, SamplerBase, SamplerResponse
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from eval_types import MessageList, SamplerBase, SamplerResponse
 
 OPENAI_SYSTEM_MESSAGE_API = "You are a helpful assistant."
 OPENAI_SYSTEM_MESSAGE_CHATGPT = (

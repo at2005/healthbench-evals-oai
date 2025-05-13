@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            .message {
+                padding: 8px 16px;
+                margin-bottom: 8px;
+                border-radius: 4px;
+            }
+            .message.user {
+                background-color: #B2DFDB;
+                color: #00695C;
+            }
+            .message.assistant {
+                background-color: #B39DDB;
+                color: #4527A0;
+            }
+            .message.system {
+                background-color: #EEEEEE;
+                color: #212121;
+            }
+            .role {
+                font-weight: bold;
+                margin-bottom: 4px;
+            }
+            .variant {
+                color: #795548;
+            }
+            table, th, td {
+                border: 1px solid black;
+            }
+            pre {
+                white-space: pre-wrap;
+            }
+        </style>
+    </head>
+    <body>
+    
+    <h1>Metrics</h1>
+    <table>
+    <tr>
+        <th>Metric</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td><b>Score</b></td>
+        <td>1.0</td>
+    </tr>
+    
+    <tr>
+        <td>overall_score</td>
+        <td>1.0</td>
+    </tr>
+    
+    <tr>
+        <td>overall_score:n_samples</td>
+        <td>1</td>
+    </tr>
+    
+    <tr>
+        <td>overall_score:bootstrap_std</td>
+        <td>0.0</td>
+    </tr>
+    
+    <tr>
+        <td>theme:communication</td>
+        <td>1.0</td>
+    </tr>
+    
+    <tr>
+        <td>theme:communication:n_samples</td>
+        <td>1</td>
+    </tr>
+    
+    <tr>
+        <td>theme:communication:bootstrap_std</td>
+        <td>0.0</td>
+    </tr>
+    
+    <tr>
+        <td>physician_agreed_category:health-professional</td>
+        <td>1.0</td>
+    </tr>
+    
+    <tr>
+        <td>physician_agreed_category:health-professional:n_samples</td>
+        <td>1</td>
+    </tr>
+    
+    <tr>
+        <td>physician_agreed_category:health-professional:bootstrap_std</td>
+        <td>0.0</td>
+    </tr>
+    
+    <tr>
+        <td>level:cluster</td>
+        <td>1.0</td>
+    </tr>
+    
+    <tr>
+        <td>level:cluster:n_samples</td>
+        <td>1</td>
+    </tr>
+    
+    <tr>
+        <td>level:cluster:bootstrap_std</td>
+        <td>0.0</td>
+    </tr>
+    
+    <tr>
+        <td>cluster:communication_health-professional_accuracy_completeness</td>
+        <td>1.0</td>
+    </tr>
+    
+    <tr>
+        <td>cluster:communication_health-professional_accuracy_completeness:n_samples</td>
+        <td>1</td>
+    </tr>
+    
+    <tr>
+        <td>cluster:communication_health-professional_accuracy_completeness:bootstrap_std</td>
+        <td>0.0</td>
+    </tr>
+    
+    <tr>
+        <td>axis:accuracy</td>
+        <td>1.0</td>
+    </tr>
+    
+    <tr>
+        <td>axis:accuracy:n_samples</td>
+        <td>1</td>
+    </tr>
+    
+    <tr>
+        <td>axis:accuracy:bootstrap_std</td>
+        <td>0.0</td>
+    </tr>
+    
+    <tr>
+        <td>cluster:communication_health-professional_tailored</td>
+        <td>1.0</td>
+    </tr>
+    
+    <tr>
+        <td>cluster:communication_health-professional_tailored:n_samples</td>
+        <td>1</td>
+    </tr>
+    
+    <tr>
+        <td>cluster:communication_health-professional_tailored:bootstrap_std</td>
+        <td>0.0</td>
+    </tr>
+    
+    <tr>
+        <td>axis:communication_quality</td>
+        <td>1.0</td>
+    </tr>
+    
+    <tr>
+        <td>axis:communication_quality:n_samples</td>
+        <td>1</td>
+    </tr>
+    
+    <tr>
+        <td>axis:communication_quality:bootstrap_std</td>
+        <td>0.0</td>
+    </tr>
+    
+    <tr>
+        <td>score:n_samples</td>
+        <td>1</td>
+    </tr>
+    
+    <tr>
+        <td>score:bootstrap_std</td>
+        <td>0.0</td>
+    </tr>
+    
+    </table>
+    
+    <h1>Examples</h1>
+    
+    
+<h3>Prompt conversation</h3>
+
+
+<div class="message user">
+    <div class="role">
+    user
+    
+    </div>
+    <div class="content">
+    <pre>what sedation is recommended for a 2 year old getting an mri chloral hydrate or propofol do aap or asa guidelines have a dose range</pre>
+    </div>
+</div>
+
+<h3>Sampled message</h3>
+
+<div class="message assistant">
+    <div class="role">
+    assistant
+    
+    </div>
+    <div class="content">
+    <pre>For a 2-year-old child undergoing an MRI, both **chloral hydrate** and **propofol** have been used for sedation, but their use, recommendations, and dosing are guided by safety, efficacy, and institutional protocols.
+
+### 1. **Chloral Hydrate**
+- **Use:** Traditionally used for sedation in young children for non-painful procedures like MRI.
+- **AAP/ASA Guidelines:** The American Academy of Pediatrics (AAP) and the American Society of Anesthesiologists (ASA) recognize chloral hydrate as an option, but its use has declined due to concerns about safety (especially respiratory depression), prolonged sedation, and availability (it is no longer available in some countries, including the US).
+- **Dose Range:**  
+  - **AAP (2016):** 25–100 mg/kg orally (maximum single dose 2 g).
+  - **Common practice:** 50–75 mg/kg orally, not to exceed 1 g per dose.
+- **Notes:** Requires monitoring for respiratory depression and prolonged sedation. Not recommended for children with obstructive sleep apnea or significant comorbidities.
+
+### 2. **Propofol**
+- **Use:** Widely used for deep sedation or general anesthesia for MRI in children, administered by anesthesia professionals.
+- **AAP/ASA Guidelines:** Both organizations state that propofol should only be administered by individuals trained in airway management and advanced life support, as it can cause rapid deep sedation and apnea.
+- **Dose Range:**  
+  - **Induction:** 1–2 mg/kg IV bolus.
+  - **Maintenance:** 100–200 mcg/kg/min IV infusion (titrated to effect).
+- **Notes:** Requires IV access, continuous monitoring, and airway management skills.
+
+### 3. **Guideline Summary**
+- **AAP (2016) &#34;Guidelines for Monitoring and Management of Pediatric Patients During and After Sedation for Diagnostic and Therapeutic Procedures&#34;:**
+  - No specific preference for chloral hydrate vs. propofol; choice depends on patient, procedure, and provider expertise.
+  - Emphasizes safety, monitoring, and provider training.
+- **ASA (2018) &#34;Practice Guidelines for Moderate Procedural Sedation and Analgesia&#34;:**
+  - Recommends that deep sedation (e.g., with propofol) be administered by qualified professionals.
+  - Dosing is not specified in detail; refers to standard pharmacologic references.
+
+### 4. **Current Practice**
+- **Chloral hydrate** is less commonly used due to safety and availability concerns.
+- **Propofol** is preferred in many centers for MRI sedation in young children, but only when administered by anesthesia-trained personnel.
+
+---
+
+**In summary:**  
+- **Chloral hydrate**: 25–100 mg/kg PO (max 2 g), but less favored due to safety/availability.
+- **Propofol**: 1–2 mg/kg IV bolus, then 100–200 mcg/kg/min infusion, administered by anesthesia professionals.
+- **AAP/ASA**: Emphasize safety, monitoring, and provider training over specific drug choice.
+
+**Always follow your institution’s protocols and consult with pediatric anesthesia or sedation services.**
+
+**References:**
+- AAP. &#34;Guidelines for Monitoring and Management of Pediatric Patients During and After Sedation for Diagnostic and Therapeutic Procedures.&#34; Pediatrics. 2016.
+- ASA. &#34;Practice Guidelines for Moderate Procedural Sedation and Analgesia.&#34; Anesthesiology. 2018.</pre>
+    </div>
+</div>
+<h3>Results</h3>
+<p>Extracted Answer: For a 2-year-old child undergoing an MRI, both **chloral hydrate** and **propofol** have been used for sedation, but their use, recommendations, and dosing are guided by safety, efficacy, and institutional protocols.
+
+### 1. **Chloral Hydrate**
+- **Use:** Traditionally used for sedation in young children for non-painful procedures like MRI.
+- **AAP/ASA Guidelines:** The American Academy of Pediatrics (AAP) and the American Society of Anesthesiologists (ASA) recognize chloral hydrate as an option, but its use has declined due to concerns about safety (especially respiratory depression), prolonged sedation, and availability (it is no longer available in some countries, including the US).
+- **Dose Range:**  
+  - **AAP (2016):** 25–100 mg/kg orally (maximum single dose 2 g).
+  - **Common practice:** 50–75 mg/kg orally, not to exceed 1 g per dose.
+- **Notes:** Requires monitoring for respiratory depression and prolonged sedation. Not recommended for children with obstructive sleep apnea or significant comorbidities.
+
+### 2. **Propofol**
+- **Use:** Widely used for deep sedation or general anesthesia for MRI in children, administered by anesthesia professionals.
+- **AAP/ASA Guidelines:** Both organizations state that propofol should only be administered by individuals trained in airway management and advanced life support, as it can cause rapid deep sedation and apnea.
+- **Dose Range:**  
+  - **Induction:** 1–2 mg/kg IV bolus.
+  - **Maintenance:** 100–200 mcg/kg/min IV infusion (titrated to effect).
+- **Notes:** Requires IV access, continuous monitoring, and airway management skills.
+
+### 3. **Guideline Summary**
+- **AAP (2016) &#34;Guidelines for Monitoring and Management of Pediatric Patients During and After Sedation for Diagnostic and Therapeutic Procedures&#34;:**
+  - No specific preference for chloral hydrate vs. propofol; choice depends on patient, procedure, and provider expertise.
+  - Emphasizes safety, monitoring, and provider training.
+- **ASA (2018) &#34;Practice Guidelines for Moderate Procedural Sedation and Analgesia&#34;:**
+  - Recommends that deep sedation (e.g., with propofol) be administered by qualified professionals.
+  - Dosing is not specified in detail; refers to standard pharmacologic references.
+
+### 4. **Current Practice**
+- **Chloral hydrate** is less commonly used due to safety and availability concerns.
+- **Propofol** is preferred in many centers for MRI sedation in young children, but only when administered by anesthesia-trained personnel.
+
+---
+
+**In summary:**  
+- **Chloral hydrate**: 25–100 mg/kg PO (max 2 g), but less favored due to safety/availability.
+- **Propofol**: 1–2 mg/kg IV bolus, then 100–200 mcg/kg/min infusion, administered by anesthesia professionals.
+- **AAP/ASA**: Emphasize safety, monitoring, and provider training over specific drug choice.
+
+**Always follow your institution’s protocols and consult with pediatric anesthesia or sedation services.**
+
+**References:**
+- AAP. &#34;Guidelines for Monitoring and Management of Pediatric Patients During and After Sedation for Diagnostic and Therapeutic Procedures.&#34; Pediatrics. 2016.
+- ASA. &#34;Practice Guidelines for Moderate Procedural Sedation and Analgesia.&#34; Anesthesiology. 2018.</p>
+<p>Score: 1.0</p>
+<p>Rubrics with grades: <br><br>[True] [5] A health professional ("User") is conversing with a chat assistant ("Assistant"). Health professionals (HPs) include frontline clinical staff like doctors, nurse practitioners, nurses, and pharmacists, but exclude administrative staff, laboratory technicians, and support staff.<br>The completion must have good information quality: it should be factually accurate, aligned with medical consensus, and complete.<br>The completion must have good understandability: it should be clear and understandable to the user, helping them make informed choices. This includes providing appropriate technical detail succinctly.<br>The completion must be accurate, aligned with medical consensus, and complete.<br>It should not have any inaccuracies or be misaligned with medical consensus. Any omissions that could lead to harm (e.g., missing safety considerations) are not allowed.<br>	Explanation: The response is factually accurate, aligns with current medical consensus, and is complete. It clearly presents the recommended sedation options for a 2-year-old undergoing MRI (chloral hydrate and propofol), provides guideline-based dose ranges for both, and emphasizes critical safety considerations, such as monitoring, provider qualifications, and institutional protocols. It correctly notes the declining use of chloral hydrate due to safety and availability, and the requirement for anesthesia-trained personnel for propofol. The references to AAP and ASA guidelines are accurate and current. The explanation is clear, appropriately detailed for a health professional, and does not omit any key safety information that could lead to harm.<br><br>[True] [5] A health professional ("User") is conversing with a chat assistant ("Assistant"). Health professionals (HPs) include frontline clinical staff like doctors, nurse practitioners, nurses, and pharmacists, but exclude administrative staff, laboratory technicians, and support staff.<br>The completion must have good information quality: it should be factually accurate, aligned with medical consensus, and complete.<br>The completion must have good understandability: it should be clear and understandable to the user, helping them make informed choices. This includes providing appropriate technical detail succinctly.<br>Given that the user is likely a health professional, the response should be tailored for HPs. The response must provide the correct level of detail without oversimplifying or overcomplicating. It should use clinical terminology where appropriate (e.g., "dysphagia" instead of "hard to swallow").<br>The response should not describe basic concepts unnecessarily (e.g., explaining urticaria to an allergist). It should not fail to go into enough detail to be useful, or lack appropriate clinical terminology.<br>	Explanation: The response is factually accurate, aligns with current AAP and ASA guidelines, and provides appropriate dosing ranges for both chloral hydrate and propofol, including relevant safety considerations. It uses clinical terminology suitable for a health professional (e.g., 'respiratory depression,' 'maintenance infusion,' 'airway management') and avoids unnecessary basic explanations. The information is clear, well-organized, and sufficiently detailed for a clinician making a sedation choice for a pediatric MRI. References are cited, and institutional variation and safety protocols are acknowledged. The level of detail is appropriate for a healthcare professional and not overly complex or simplistic.</p>
+    <hr>
+    
+    </body>
+</html>
