@@ -1,0 +1,96 @@
+import os
+import time
+from typing import Any
+import requests
+
+from eval_types import MessageList, SamplerBase, SamplerResponse
+
+class AISDKSampler(SamplerBase):
+    """
+    Sample from a Next.js project using Vercel AI SDK, sending requests to a local API endpoint
+    """
+
+    def __init__(
+        self,
+        model: str = "gpt-4.1",
+        system_message: str | None = None,
+        temperature: float = 0.5,
+        max_tokens: int = 1024,
+        api_url: str = "http://localhost:3000/api/eval",
+    ):
+        self.api_url = api_url
+        self.model = model
+        self.system_message = system_message
+        self.temperature = temperature
+        self.max_tokens = max_tokens
+        self.image_format = "url"
+
+    def _handle_image(
+        self,
+        image: str,
+        encoding: str = "base64",
+        format: str = "png",
+        fovea: int = 768,
+    ) -> dict[str, Any]:
+        new_image = {
+            "type": "input_image",
+            "image_url": f"data:image/{format};{encoding},{image}",
+        }
+        return new_image
+
+    def _handle_text(self, text: str) -> dict[str, Any]:
+        return {"type": "input_text", "text": text}
+
+    def _pack_message(self, role: str, content: Any) -> dict[str, Any]:
+        return {"role": role, "content": content}
+
+    def __call__(self, message_list: MessageList) -> SamplerResponse:
+        if self.system_message:
+            message_list = [
+                self._pack_message("developer", self.system_message)
+            ] + message_list
+            
+        # Prepare the data to send to the Next.js API
+        payload = {
+            "messages": message_list,
+            "model": self.model,
+            "temperature": self.temperature,
+            "max_tokens": self.max_tokens,
+        }
+        
+        trial = 0
+        while True:
+            try:
+                # Send request to the Next.js API
+                response = requests.post(
+                    self.api_url,
+                    json=payload,
+                    headers={"Content-Type": "application/json"}
+                )
+                
+                # Check if the request was successful
+                response.raise_for_status()
+                
+                # Parse the response
+                response_data = response.json()
+                
+                return SamplerResponse(
+                    response_text=response_data.get("content", ""),
+                    response_metadata={"usage": response_data.get("metadata", {}).get("usage")},
+                    actual_queried_message_list=message_list,
+                )
+            except requests.exceptions.RequestException as e:
+                if "400" in str(e):
+                    print("Bad Request Error", e)
+                    return SamplerResponse(
+                        response_text="",
+                        response_metadata={"usage": None},
+                        actual_queried_message_list=message_list,
+                    )
+                exception_backoff = 2**trial  # exponential backoff
+                print(
+                    f"Rate limit exception so wait and retry {trial} after {exception_backoff} sec",
+                    e,
+                )
+                time.sleep(exception_backoff)
+                trial += 1
