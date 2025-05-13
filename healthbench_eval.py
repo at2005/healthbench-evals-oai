@@ -2,13 +2,16 @@
 This script evaluates the performance of a model on the HealthBench dataset.
 
 To run HealthBench, HealthBench Consensus, or HealthBench Hard, use the simple-evals script:
-- `python -m simple-evals.simple_evals --eval=healthbench --model=gpt-4.1`
-- `python -m simple-evals.simple_evals --eval=healthbench_consensus --model=gpt-4.1`
-- `python -m simple-evals.simple_evals --eval=healthbench_hard --model=gpt-4.1`
+- `python -m healthbench-evals-oai.healthbench_eval --eval=healthbench --model=gpt-4.1`
+- `python -m healthbench-evals-oai.healthbench_eval --eval=healthbench_consensus --model=gpt-4.1`
+- `python -m healthbench-evals-oai.healthbench_eval --eval=healthbench_hard --model=gpt-4.1`
 
 You can also evaluate physician ideal completions or reference completions against the HealthBench rubrics. To do so, run the following command:
 - To evaluate physician ideal completions: `python -m simple-evals.healthbench_eval --run_mode=physician_completions`
 - To evaluate reference model completions used by physicians: `python -m simple-evals.healthbench_eval --run_mode=physician_completion_references`
+
+To use a local file instead of remote data:
+- `python -m simple-evals.healthbench_eval --custom_input_path=data/consensus.jsonl`
 """
 
 import argparse
@@ -273,6 +276,8 @@ class HealthBenchEval(Eval):
         run_reference_completions: bool = False,
         n_threads: int = 120,
         subset_name: Literal["hard", "consensus"] | None = None,
+        # Custom input path for local file
+        custom_input_path: str | None = None,
     ):
         if run_reference_completions:
             assert physician_completions_mode is not None, (
@@ -284,7 +289,10 @@ class HealthBenchEval(Eval):
                 "physician_completions_mode must have reference completions if run_reference_completions is True"
             )
 
-        if subset_name == "hard":
+        # Use custom input path if provided, otherwise use default paths
+        if custom_input_path is not None:
+            input_path = custom_input_path
+        elif subset_name == "hard":
             input_path = INPUT_PATH_HARD
         elif subset_name == "consensus":
             input_path = INPUT_PATH_CONSENSUS
@@ -292,6 +300,7 @@ class HealthBenchEval(Eval):
             input_path = INPUT_PATH
         else:
             assert False, f"Invalid subset name: {subset_name}"
+            
         with bf.BlobFile(input_path, "rb") as f:
             examples = [json.loads(line) for line in f]
         for example in examples:
@@ -531,6 +540,11 @@ def main():
         default=120,
         help="Number of threads to run",
     )
+    parser.add_argument(
+        "--custom_input_path",
+        type=str,
+        help="Custom path to a local jsonl file containing evaluation examples",
+    )
     args = parser.parse_args()
 
     if args.run_mode == "physician_completions":
@@ -538,22 +552,92 @@ def main():
             run_reference_completions=False,
             num_examples=args.examples,
             n_threads=args.n_threads or 1,
+            custom_input_path=args.custom_input_path,
         )
     elif args.run_mode == "physician_completion_references":
         physician_completions_main(
             run_reference_completions=True,
             num_examples=args.examples,
             n_threads=args.n_threads or 1,
+            custom_input_path=args.custom_input_path,
         )
-
     else:
-        raise ValueError(f"Invalid run mode: {args.run_mode}")
+        # If no run_mode specified but custom_input_path is, run standard eval with that file
+        if args.custom_input_path:
+            run_custom_eval(
+                custom_input_path=args.custom_input_path,
+                num_examples=args.examples,
+                n_threads=args.n_threads or 1,
+            )
+        else:
+            raise ValueError(f"Either run_mode or custom_input_path must be specified")
+
+
+def run_custom_eval(
+    custom_input_path: str,
+    num_examples: int | None = None,
+    n_threads: int = 120,
+):
+    """Run evaluation using a custom input path."""
+    now = datetime.now()
+    date_str = now.strftime("%Y%m%d_%H%M")
+
+    grading_sampler = ChatCompletionSampler(
+        model="gpt-4.1-2025-04-14",
+        system_message=OPENAI_SYSTEM_MESSAGE_API,
+        max_tokens=2048,
+    )
+
+    # Get model from user input
+    model_name = input("Enter model name to evaluate (e.g., gpt-4.1-2025-04-14): ")
+    sampler = ChatCompletionSampler(
+        model=model_name,
+        system_message=OPENAI_SYSTEM_MESSAGE_API,
+        max_tokens=2048,
+    )
+
+    # Run eval
+    eval = HealthBenchEval(
+        grader_model=grading_sampler,
+        num_examples=num_examples,
+        n_threads=n_threads,
+        custom_input_path=custom_input_path,
+    )
+    result = eval(sampler)
+
+    # Report
+    file_stem = f"healthbench_custom_{Path(custom_input_path).stem}_{date_str}"
+    report_filename = Path(f"/tmp/{file_stem}.html")
+    report_filename.write_text(common.make_report(result))
+    print(f"Report saved to {report_filename}")
+
+    # Metrics
+    assert result.metrics is not None
+    metrics = result.metrics
+    result_filename = Path(f"/tmp/{file_stem}.json")
+    result_filename.write_text(json.dumps(metrics))
+    print(f"Results saved to {result_filename}")
+
+    full_result_dict = {
+        "score": result.score,
+        "metrics": result.metrics,
+        "htmls": result.htmls,
+        "convos": result.convos,
+        "metadata": result.metadata,
+    }
+    full_result_filename = Path(f"/tmp/{file_stem}_allresults.json")
+    full_result_filename.write_text(json.dumps(full_result_dict, indent=2))
+    print(f"All results saved to {full_result_filename}")
+
+    print(f"\nOverall score: {result.score}")
+    return result
 
 
 def physician_completions_main(
     run_reference_completions: bool = False,
     num_examples: int | None = None,
     n_threads: int = 120,
+    custom_input_path: str | None = None,
 ):
     now = datetime.now()
     date_str = now.strftime("%Y%m%d_%H%M")
@@ -580,6 +664,7 @@ def physician_completions_main(
             run_reference_completions=run_reference_completions,
             num_examples=num_examples,
             n_threads=n_threads,
+            custom_input_path=custom_input_path,
         )
         result = eval(dummy_sampler)
 
