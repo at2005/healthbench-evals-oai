@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Compare Evaluations - HealthBench Dashboard{% endblock %}
+
+{% block head %}
+<style>
+    .comparison-table th, .comparison-table td {
+        text-align: center;
+    }
+    .comparison-table th:first-child, .comparison-table td:first-child {
+        text-align: left;
+    }
+    .chart-container {
+        height: 400px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Compare Evaluations</h1>
+    <a href="/" class="btn btn-outline-primary"><i class="bi bi-arrow-left"></i> Back</a>
+</div>
+
+{% if evaluations|length >= 2 %}
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Overview</h5>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Evaluation</th>
+                        <th>Model</th>
+                        <th>Dataset</th>
+                        <th>Examples</th>
+                        <th>Repeats</th>
+                        <th>Temperature</th>
+                        <th>Overall Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for eval in evaluations %}
+                    <tr>
+                        <td><a href="/eval/{{ eval.id }}">{{ eval.id }}</a></td>
+                        <td>{{ eval.model }}</td>
+                        <td>{{ eval.dataset }}</td>
+                        <td>{{ eval.n_examples }}</td>
+                        <td>{{ eval.n_repeats }}</td>
+                        <td>{{ eval.temperature }}</td>
+                        <td>
+                            <span class="badge rounded-pill {% if eval.score >= 0.8 %}bg-success{% elif eval.score >= 0.6 %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ "%.2f"|format(eval.score) }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Overall Score Comparison</h5>
+        <div class="chart-container">
+            <canvas id="overallScoreChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Category Scores Comparison</h5>
+        
+        {% set all_categories = [] %}
+        {% for eval in evaluations %}
+            {% for category in eval.category_scores.keys() %}
+                {% if category not in all_categories %}
+                    {% set _ = all_categories.append(category) %}
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+        
+        {% if all_categories %}
+        <div class="table-responsive">
+            <table class="table table-striped comparison-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        {% for eval in evaluations %}
+                        <th>{{ eval.model }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in all_categories %}
+                    <tr>
+                        <td>{{ category }}</td>
+                        {% for eval in evaluations %}
+                        <td>
+                            {% if category in eval.category_scores %}
+                            <span class="badge rounded-pill {% if eval.category_scores[category] >= 0.8 %}bg-success{% elif eval.category_scores[category] >= 0.6 %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ "%.2f"|format(eval.category_scores[category]) }}
+                            </span>
+                            {% else %}
+                            <span class="badge bg-secondary">N/A</span>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="chart-container mt-4">
+            <canvas id="categoryComparisonChart"></canvas>
+        </div>
+        {% else %}
+        <div class="alert alert-warning">No category scores available for comparison.</div>
+        {% endif %}
+    </div>
+</div>
+
+{% else %}
+<div class="alert alert-warning">
+    <h4 class="alert-heading">Not enough evaluations selected!</h4>
+    <p>You need to select at least two evaluations to compare.</p>
+    <a href="/compare" class="btn btn-primary">Select Evaluations</a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if evaluations|length >= 2 %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Overall score chart
+        const ctxOverall = document.getElementById('overallScoreChart').getContext('2d');
+        
+        new Chart(ctxOverall, {
+            type: 'bar',
+            data: {
+                labels: [{% for eval in evaluations %}'{{ eval.model }}',{% endfor %}],
+                datasets: [{
+                    label: 'Overall Score',
+                    data: [{% for eval in evaluations %}{{ eval.score }},{% endfor %}],
+                    backgroundColor: [
+                        {% for eval in evaluations %}
+                        '{{ "rgba(40, 167, 69, 0.7)" if eval.score >= 0.8 else "rgba(255, 193, 7, 0.7)" if eval.score >= 0.6 else "rgba(220, 53, 69, 0.7)" }}',
+                        {% endfor %}
+                    ],
+                    borderColor: [
+                        {% for eval in evaluations %}
+                        '{{ "rgb(40, 167, 69)" if eval.score >= 0.8 else "rgb(255, 193, 7)" if eval.score >= 0.6 else "rgb(220, 53, 69)" }}',
+                        {% endfor %}
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1,
+                        title: {
+                            display: true,
+                            text: 'Score'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Category comparison chart
+        const allCategories = {{ all_categories|tojson }};
+        
+        if (allCategories.length > 0) {
+            const ctxCategory = document.getElementById('categoryComparisonChart').getContext('2d');
+            
+            const datasets = [];
+            {% for eval in evaluations %}
+            datasets.push({
+                label: '{{ eval.model }}',
+                data: allCategories.map(category => {
+                    return {{ eval.category_scores|tojson }}.hasOwnProperty(category) 
+                           ? {{ eval.category_scores|tojson }}[category] 
+                           : null;
+                }),
+                backgroundColor: '{{ "rgba(40, 167, 69, 0.7)" if eval.score >= 0.8 else "rgba(255, 193, 7, 0.7)" if eval.score >= 0.6 else "rgba(220, 53, 69, 0.7)" }}',
+                borderColor: '{{ "rgb(40, 167, 69)" if eval.score >= 0.8 else "rgb(255, 193, 7)" if eval.score >= 0.6 else "rgb(220, 53, 69)" }}',
+                borderWidth: 1
+            });
+            {% endfor %}
+            
+            new Chart(ctxCategory, {
+                type: 'radar',
+                data: {
+                    labels: allCategories,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 1,
+                            min: 0,
+                            ticks: {
+                                stepSize: 0.2
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endif %}
+{% endblock %} 

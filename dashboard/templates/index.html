@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}HealthBench Dashboard - Evaluations{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">HealthBench Evaluations</h1>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Evaluation Statistics</h5>
+                <p>Total evaluations: <strong>{{ evaluations|length }}</strong></p>
+                {% if evaluations %}
+                <p>Latest evaluation: <strong>{{ evaluations[0].timestamp|replace("T", " ")|replace("Z", "") }}</strong></p>
+                <p>Models tested: 
+                    <strong>
+                    {% set models = [] %}
+                    {% for eval in evaluations %}
+                        {% if eval.model not in models %}
+                            {% set _ = models.append(eval.model) %}
+                        {% endif %}
+                    {% endfor %}
+                    {{ models|join(", ") }}
+                    </strong>
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Actions</h5>
+                <a href="/compare" class="btn btn-primary">Compare Evaluations</a>
+                <a href="#" class="btn btn-secondary" onclick="alert('Run python hb.py to create a new evaluation')">New Evaluation</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if evaluations %}
+<h2 class="mb-3">Recent Evaluations</h2>
+<div class="row">
+    {% for eval in evaluations %}
+    <div class="col-md-6">
+        <a href="/eval/{{ eval.id }}" class="text-decoration-none">
+            <div class="card eval-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="card-title mb-0">{{ eval.model }}</h5>
+                        <span class="badge rounded-pill {% if eval.score >= 0.8 %}bg-success{% elif eval.score >= 0.6 %}bg-warning{% else %}bg-danger{% endif %} score-badge">
+                            Score: {{ "%.2f"|format(eval.score) }}
+                        </span>
+                    </div>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ eval.timestamp|replace("T", " ")|replace("Z", "") }}</h6>
+                    <div class="card-text">
+                        <p>Dataset: <strong>{{ eval.dataset }}</strong></p>
+                        <p>Examples: <strong>{{ eval.n_examples }}</strong> ({{ eval.n_repeats }} repeats)</p>
+                        <p>Temperature: <strong>{{ eval.temperature }}</strong></p>
+                    </div>
+                    <div class="text-end">
+                        <i class="bi bi-arrow-right fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+{% else %}
+<div class="alert alert-info">
+    <h4 class="alert-heading">No evaluations found!</h4>
+    <p>Run some evaluations with the <code>python hb.py</code> command to see them here.</p>
+</div>
+{% endif %}
+{% endblock %} 

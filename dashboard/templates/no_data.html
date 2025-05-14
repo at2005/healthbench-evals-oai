@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}No Data - HealthBench Dashboard{% endblock %}
+
+{% block content %}
+<div class="alert alert-warning">
+    <h4 class="alert-heading">No evaluation data found!</h4>
+    <p>You need to run some evaluations before you can use the dashboard.</p>
+    <hr>
+    <p class="mb-0">Run <code>python hb.py</code> to generate evaluation data that will appear here.</p>
+</div>
+{% endblock %} 

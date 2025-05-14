@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}Evaluation: {{ eval.id }} - {{ eval.model }}{% endblock %}
+
+{% block head %}
+<style>
+    .progress {
+        height: 25px;
+    }
+    .progress-bar {
+        font-weight: bold;
+    }
+    .category-chart-container {
+        height: 400px;
+    }
+    .example-card {
+        margin-bottom: 20px;
+    }
+    .example-row:hover {
+        background-color: #f8f9fa;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Evaluation: {{ eval.model }}</h1>
+    <a href="/" class="btn btn-outline-primary"><i class="bi bi-arrow-left"></i> Back</a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Overview</h5>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6>Overall Score:</h6>
+                    <span class="badge rounded-pill {% if eval.score >= 0.8 %}bg-success{% elif eval.score >= 0.6 %}bg-warning{% else %}bg-danger{% endif %} score-badge">
+                        {{ "%.2f"|format(eval.score) }}
+                    </span>
+                </div>
+                <p>Model: <strong>{{ eval.model }}</strong></p>
+                <p>Dataset: <strong>{{ eval.dataset }}</strong></p>
+                <p>Number of examples: <strong>{{ eval.n_examples }}</strong></p>
+                <p>Repeats per example: <strong>{{ eval.n_repeats }}</strong></p>
+                <p>Temperature: <strong>{{ eval.temperature }}</strong></p>
+                <p>Timestamp: <strong>{{ eval.timestamp|replace("T", " ")|replace("Z", "") }}</strong></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Actions</h5>
+                <a href="{{ eval.report_path }}" class="btn btn-primary mb-2" target="_blank">View HTML Report</a>
+                <a href="{{ eval.metrics_path }}" class="btn btn-info mb-2" target="_blank">View Metrics JSON</a>
+                <a href="{{ eval.full_results_path }}" class="btn btn-secondary mb-2" target="_blank">View Full Results</a>
+                <a href="/compare" class="btn btn-warning">Compare With Others</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="scores-tab" data-bs-toggle="tab" data-bs-target="#scores" type="button" role="tab" aria-controls="scores" aria-selected="true">Category Scores</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="examples-tab" data-bs-toggle="tab" data-bs-target="#examples" type="button" role="tab" aria-controls="examples" aria-selected="false">Examples</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="visualization-tab" data-bs-toggle="tab" data-bs-target="#visualization" type="button" role="tab" aria-controls="visualization" aria-selected="false">Visualization</button>
+    </li>
+</ul>
+
+<div class="tab-content" id="myTabContent">
+    <!-- Category Scores Tab -->
+    <div class="tab-pane fade show active" id="scores" role="tabpanel" aria-labelledby="scores-tab">
+        <div class="mt-4">
+            <h3>Category Scores</h3>
+            {% if category_scores %}
+            <div class="list-group">
+                {% for category, score in category_scores.items() %}
+                <div class="list-group-item">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ category }}</h5>
+                        <span class="badge rounded-pill {% if score >= 0.8 %}bg-success{% elif score >= 0.6 %}bg-warning{% else %}bg-danger{% endif %}">
+                            {{ "%.2f"|format(score) }}
+                        </span>
+                    </div>
+                    <div class="progress mt-2">
+                        <div class="progress-bar {% if score >= 0.8 %}bg-success{% elif score >= 0.6 %}bg-warning{% else %}bg-danger{% endif %}" 
+                             role="progressbar" 
+                             style="width: {{ score * 100 }}%;" 
+                             aria-valuenow="{{ score * 100 }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            {{ "%.0f%%"|format(score * 100) }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-warning">No category scores found.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Examples Tab -->
+    <div class="tab-pane fade" id="examples" role="tabpanel" aria-labelledby="examples-tab">
+        <div class="mt-4">
+            <h3>Examples ({{ convos|length }})</h3>
+            
+            <div class="accordion" id="examplesAccordion">
+                {% for convo in convos %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading{{ loop.index }}">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" aria-expanded="false" aria-controls="collapse{{ loop.index }}">
+                            Example #{{ loop.index }} 
+                            {% if metadata_items and metadata_items[loop.index0] %}
+                                <span class="ms-3 badge {% if metadata_items[loop.index0].score >= 0.8 %}bg-success{% elif metadata_items[loop.index0].score >= 0.6 %}bg-warning{% else %}bg-danger{% endif %}">
+                                    Score: {{ "%.2f"|format(metadata_items[loop.index0].score) }}
+                                </span>
+                            {% endif %}
+                        </button>
+                    </h2>
+                    <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading{{ loop.index }}" data-bs-parent="#examplesAccordion">
+                        <div class="accordion-body">
+                            <div class="conversation-container">
+                                {% for message in convo %}
+                                <div class="message {{ message.role }}">
+                                    <strong>{{ message.role|capitalize }}:</strong>
+                                    <pre style="white-space: pre-wrap;">{{ message.content }}</pre>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            {% if metadata_items and metadata_items[loop.index0] and metadata_items[loop.index0].rubric_items %}
+                            <h5 class="mt-4">Rubric Items</h5>
+                            <div class="list-group">
+                                {% for item in metadata_items[loop.index0].rubric_items %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">[{{ item.points }}] {{ item.criterion }}</h6>
+                                        <span class="badge {% if item.criteria_met %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ "Met" if item.criteria_met else "Not Met" }}
+                                        </span>
+                                    </div>
+                                    <p class="mb-1"><strong>Explanation:</strong> {{ item.explanation }}</p>
+                                    {% if item.tags %}
+                                    <p class="mb-1"><strong>Tags:</strong> {{ item.tags|join(", ") }}</p>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Visualization Tab -->
+    <div class="tab-pane fade" id="visualization" role="tabpanel" aria-labelledby="visualization-tab">
+        <div class="mt-4">
+            <h3>Score Visualization</h3>
+            <div class="category-chart-container">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get category scores for chart
+        const categoryScores = {{ category_scores|tojson }};
+        
+        if (Object.keys(categoryScores).length > 0) {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            
+            const chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(categoryScores),
+                    datasets: [{
+                        label: 'Category Scores',
+                        data: Object.values(categoryScores),
+                        backgroundColor: Object.values(categoryScores).map(score => {
+                            if (score >= 0.8) return 'rgba(40, 167, 69, 0.7)';
+                            if (score >= 0.6) return 'rgba(255, 193, 7, 0.7)';
+                            return 'rgba(220, 53, 69, 0.7)';
+                        }),
+                        borderColor: Object.values(categoryScores).map(score => {
+                            if (score >= 0.8) return 'rgb(40, 167, 69)';
+                            if (score >= 0.6) return 'rgb(255, 193, 7)';
+                            return 'rgb(220, 53, 69)';
+                        }),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 1,
+                            title: {
+                                display: true,
+                                text: 'Score'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 90,
+                                minRotation: 45
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Score: ${context.parsed.y.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %} 

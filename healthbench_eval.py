@@ -616,6 +616,7 @@ def run_custom_eval(
             max_tokens=int(os.environ.get("AI_SDK_MAX_TOKENS", "1024")),
             api_url=os.environ.get("AI_SDK_API_URL", "http://localhost:3000/api/eval"),
         )
+        model_name = os.environ.get("AI_SDK_MODEL", "gpt-4.1")
     else:
         # Get model from user input
         model_name = input("Enter model name to evaluate (e.g., gpt-4.1-2025-04-14): ")
@@ -658,8 +659,54 @@ def run_custom_eval(
     full_result_filename = results_dir / f"{file_stem}_allresults.json"
     full_result_filename.write_text(json.dumps(full_result_dict, indent=2))
     print(f"All results saved to {full_result_filename}")
+    
+    # Save metadata for dashboard
+    metadata = {
+        "id": date_str,
+        "timestamp": datetime.now().isoformat(),
+        "model": model_name,
+        "dataset": Path(custom_input_path).stem,
+        "n_examples": len(eval.examples) // n_repeats if n_repeats > 0 else 0,
+        "n_repeats": n_repeats,
+        "score": result.score,
+        "temperature": float(os.environ.get("AI_SDK_TEMPERATURE", "1.0")) if os.environ.get("AI_SDK_MODEL") else sampler.temperature,
+        "report_path": str(report_filename),
+        "metrics_path": str(result_filename),
+        "full_results_path": str(full_result_filename),
+        # Extract category-specific scores
+        "category_scores": {k: v for k, v in metrics.items() if ':' not in k and k != 'score'}
+    }
+    
+    # Create metadata directory if it doesn't exist
+    metadata_dir = Path("dashboard/data")
+    metadata_dir.mkdir(exist_ok=True, parents=True)
+    
+    # Save individual metadata file
+    metadata_file = metadata_dir / f"{date_str}.json"
+    metadata_file.write_text(json.dumps(metadata, indent=2))
+    
+    # Update master metadata index
+    master_index_path = metadata_dir / "index.json"
+    if master_index_path.exists():
+        try:
+            index_data = json.loads(master_index_path.read_text())
+        except json.JSONDecodeError:
+            index_data = {"evaluations": []}
+    else:
+        index_data = {"evaluations": []}
+    
+    # Add this evaluation to the index
+    index_data["evaluations"].append(metadata)
+    # Sort by timestamp (most recent first)
+    index_data["evaluations"] = sorted(
+        index_data["evaluations"], 
+        key=lambda x: x.get("timestamp", ""), 
+        reverse=True
+    )
+    master_index_path.write_text(json.dumps(index_data, indent=2))
 
     print(f"\nOverall score: {result.score}")
+    print(f"Evaluation metadata saved to dashboard system")
     return result
 
 
