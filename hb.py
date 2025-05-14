@@ -18,7 +18,7 @@ def main():
     parser.add_argument(
         "--input_file", 
         type=str, 
-        default="data/consensus_10.jsonl",
+        default="data/consensus_xs.jsonl",
         help="Path to local jsonl file containing evaluation examples"
     )
     parser.add_argument(

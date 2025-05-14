@@ -100,7 +100,24 @@ def compare_evaluations():
             if eval_path.exists():
                 try:
                     with open(eval_path, 'r') as f:
-                        eval_data.append(json.load(f))
+                        eval_item = json.load(f)
+                        
+                        # Load the full results data for example comparison
+                        full_results_path = Path(eval_item.get('full_results_path', ''))
+                        if full_results_path.exists():
+                            try:
+                                with open(full_results_path, 'r') as rf:
+                                    full_results = json.load(rf)
+                                    eval_item['convos'] = full_results.get('convos', [])
+                                    eval_item['metadata_items'] = full_results.get('metadata', {}).get('example_level_metadata', [])
+                            except json.JSONDecodeError:
+                                eval_item['convos'] = []
+                                eval_item['metadata_items'] = []
+                        else:
+                            eval_item['convos'] = []
+                            eval_item['metadata_items'] = []
+                            
+                        eval_data.append(eval_item)
                 except json.JSONDecodeError:
                     continue
         

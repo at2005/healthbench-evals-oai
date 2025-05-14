@@ -43,8 +43,8 @@ def load_reference_scores(model: str, dialog_value: str):
         for line in f:
             try:
                 entry = json.loads(line.strip())
-                # Check if this is the matching dialog
-                if entry.get("dialog") == dialog_value:
+                # Check if this is the matching dialog (prompt)
+                if entry.get("prompt") == dialog_value:
                     return entry.get("scores", {})
             except json.JSONDecodeError:
                 continue

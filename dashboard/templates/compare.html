@@ -78,6 +78,9 @@
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="rubric-tag-tab" data-bs-toggle="pill" data-bs-target="#rubric-tag" type="button" role="tab" aria-controls="rubric-tag" aria-selected="false">Rubric Tags</button>
     </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="example-tab" data-bs-toggle="pill" data-bs-target="#example" type="button" role="tab" aria-controls="example" aria-selected="false">Example Comparison</button>
+    </li>
 </ul>
 
 <div class="tab-content" id="compare-tabContent">
@@ -314,6 +317,130 @@
             </div>
         </div>
     </div>
+    
+    <!-- Example Comparison Tab -->
+    <div class="tab-pane fade" id="example" role="tabpanel" aria-labelledby="example-tab">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Example-by-Example Comparison</h5>
+                
+                {% set max_examples = 0 %}
+                {% for eval in evaluations %}
+                    {% if eval.metadata_items|length > max_examples %}
+                        {% set max_examples = eval.metadata_items|length %}
+                    {% endif %}
+                {% endfor %}
+                
+                {% if max_examples > 0 %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill"></i> 
+                    This table shows scores for each example across all evaluations being compared.
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-striped comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Example</th>
+                                {% for eval in evaluations %}
+                                <th>{{ eval.model }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(max_examples) %}
+                            <tr>
+                                <td><strong>Example #{{ i+1 }}</strong></td>
+                                {% for eval in evaluations %}
+                                <td>
+                                    {% if i < eval.metadata_items|length %}
+                                    <span class="badge rounded-pill {% if eval.metadata_items[i].score >= 0.8 %}bg-success{% elif eval.metadata_items[i].score >= 0.6 %}bg-warning{% else %}bg-danger{% endif %}">
+                                        {{ "%.2f"|format(eval.metadata_items[i].score) }}
+                                    </span>
+                                    
+                                    <!-- Button to trigger modal -->
+                                    <button type="button" class="btn btn-sm btn-outline-secondary ms-2" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#exampleModal{{ eval.id }}_{{ i }}">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    
+                                    <!-- Modal for example details -->
+                                    <div class="modal fade" id="exampleModal{{ eval.id }}_{{ i }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ eval.id }}_{{ i }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel{{ eval.id }}_{{ i }}">
+                                                        Example #{{ i+1 }} - {{ eval.model }}
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <!-- Conversation -->
+                                                    <h6>Conversation:</h6>
+                                                    <div class="conversation-container mb-3">
+                                                        {% if i < eval.convos|length %}
+                                                            {% for message in eval.convos[i] %}
+                                                            <div class="message {{ message.role }}">
+                                                                <strong>{{ message.role|capitalize }}:</strong>
+                                                                <pre style="white-space: pre-wrap;">{{ message.content }}</pre>
+                                                            </div>
+                                                            {% endfor %}
+                                                        {% else %}
+                                                            <div class="alert alert-warning">Conversation not available.</div>
+                                                        {% endif %}
+                                                    </div>
+                                                    
+                                                    <!-- Rubric Items -->
+                                                    <h6>Rubric Items:</h6>
+                                                    {% if i < eval.metadata_items|length and eval.metadata_items[i].rubric_items %}
+                                                    <div class="list-group">
+                                                        {% for item in eval.metadata_items[i].rubric_items %}
+                                                        <div class="list-group-item">
+                                                            <div class="d-flex w-100 justify-content-between">
+                                                                <h6 class="mb-1">[{{ item.points }}] {{ item.criterion }}</h6>
+                                                                <span class="badge {% if item.criteria_met %}bg-success{% else %}bg-danger{% endif %}">
+                                                                    {{ "Met" if item.criteria_met else "Not Met" }}
+                                                                </span>
+                                                            </div>
+                                                            <p class="mb-1"><strong>Explanation:</strong> {{ item.explanation }}</p>
+                                                            {% if item.tags %}
+                                                            <p class="mb-1"><strong>Tags:</strong> {{ item.tags|join(", ") }}</p>
+                                                            {% endif %}
+                                                        </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% else %}
+                                                    <div class="alert alert-warning">Rubric items not available.</div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <span class="badge bg-secondary">N/A</span>
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Example score chart -->
+                <div class="chart-container mt-4">
+                    <canvas id="exampleComparisonChart"></canvas>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">No example-level metadata available for comparison.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
 
 {% else %}
@@ -457,6 +584,73 @@
                                 autoSkip: false,
                                 maxRotation: 90,
                                 minRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Example comparison chart
+        const maxExamples = {{ max_examples|default(0) }};
+        
+        if (maxExamples > 0 && document.getElementById('exampleComparisonChart')) {
+            const ctxExample = document.getElementById('exampleComparisonChart').getContext('2d');
+            
+            const exampleDatasets = [];
+            const exampleLabels = [];
+            
+            // Create labels for all examples
+            for (let i = 0; i < maxExamples; i++) {
+                exampleLabels.push(`Example #${i+1}`);
+            }
+            
+            // Create datasets for each evaluation
+            {% for eval in evaluations %}
+            exampleDatasets.push({
+                label: '{{ eval.model }}',
+                data: Array(maxExamples).fill(null).map((_, i) => {
+                    if (i < {{ eval.metadata_items|length }}) {
+                        return {{ eval.metadata_items|tojson }}[i].score;
+                    }
+                    return null;
+                }),
+                backgroundColor: '{{ "rgba(40, 167, 69, 0.7)" if eval.score >= 0.8 else "rgba(255, 193, 7, 0.7)" if eval.score >= 0.6 else "rgba(220, 53, 69, 0.7)" }}',
+                borderColor: '{{ "rgb(40, 167, 69)" if eval.score >= 0.8 else "rgb(255, 193, 7)" if eval.score >= 0.6 else "rgb(220, 53, 69)" }}',
+                borderWidth: 1
+            });
+            {% endfor %}
+            
+            new Chart(ctxExample, {
+                type: 'line',
+                data: {
+                    labels: exampleLabels,
+                    datasets: exampleDatasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 1,
+                            title: {
+                                display: true,
+                                text: 'Score'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                autoSkip: true
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}`;
+                                }
                             }
                         }
                     }
