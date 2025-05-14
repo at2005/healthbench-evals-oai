@@ -10,9 +10,10 @@ from eval_types import MessageList, SamplerBase, SamplerResponse
 TokenDetails = namedtuple('TokenDetails', ['cached_tokens', 'reasoning_tokens'], defaults=[0, 0])
 Usage = namedtuple('Usage', ['input_tokens', 'output_tokens', 'total_tokens', 'input_tokens_details', 'output_tokens_details'], defaults=[0, 0, 0, None, None])
 
-class AISDKSampler(SamplerBase):
+class SimulateSampler(SamplerBase):
     """
-    Sample from a Next.js project using Vercel AI SDK, sending requests to a local API endpoint
+    A sampler that sends requests to a local API endpoint with simulate=true,
+    extracting the auto_select_model from the response.
     """
 
     def __init__(
@@ -86,6 +87,7 @@ class AISDKSampler(SamplerBase):
             "userSelectedModel": self.model,
             "temperature": self.temperature,
             "maxTokens": self.max_tokens,
+            "simulate": True,  # Add simulate=true parameter
         }
         
         trial = 0
@@ -104,13 +106,16 @@ class AISDKSampler(SamplerBase):
                 # Parse the response
                 response_data = response.json()
                 
+                # Get auto_select_model from the response
+                auto_select_model = response_data.get("autoSelectedModel", self.model)
+                
                 # Get usage data and format it to match expected structure
                 usage_data = response_data.get("metadata", {}).get("usage")
                 formatted_usage = self._format_usage_object(usage_data)
                 
                 return SamplerResponse(
-                    response_text=response_data.get("content", ""),
-                    response_metadata={"usage": formatted_usage},
+                    response_text=auto_select_model,  # Return the auto_select_model as the response text
+                    response_metadata={"usage": formatted_usage, "auto_select_model": auto_select_model},
                     actual_queried_message_list=message_list,
                 )
             except requests.exceptions.RequestException as e:
@@ -127,4 +132,4 @@ class AISDKSampler(SamplerBase):
                     e,
                 )
                 time.sleep(exception_backoff)
-                trial += 1
+                trial += 1 
