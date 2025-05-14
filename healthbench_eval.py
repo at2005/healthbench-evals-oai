@@ -660,6 +660,77 @@ def run_custom_eval(
     full_result_filename.write_text(json.dumps(full_result_dict, indent=2))
     print(f"All results saved to {full_result_filename}")
     
+    # Compute theme-category scores and rubric tag scores
+    theme_category_scores = {}
+    rubric_tag_scores = {}
+    
+    # Get example-level metadata
+    example_metadata = result.metadata.get("example_level_metadata", [])
+    
+    # Calculate theme-category scores
+    for i, example in enumerate(eval.examples):
+        if i >= len(example_metadata):
+            continue
+            
+        # Extract theme and category from example_tags
+        theme = None
+        category = None
+        for tag in example.get("example_tags", []):
+            if tag.startswith("theme:"):
+                theme = tag.split(":", 1)[1]
+            elif tag.startswith("physician_agreed_category:"):
+                category = tag.split(":", 1)[1]
+        
+        if theme and category:
+            theme_category_key = f"{theme}/{category}"
+            if theme_category_key not in theme_category_scores:
+                theme_category_scores[theme_category_key] = {"scores": [], "count": 0}
+            
+            score = example_metadata[i].get("score")
+            if score is not None:
+                theme_category_scores[theme_category_key]["scores"].append(score)
+                theme_category_scores[theme_category_key]["count"] += 1
+    
+    # Calculate average for each theme-category
+    theme_category_avg_scores = {}
+    for key, data in theme_category_scores.items():
+        if data["count"] > 0:
+            theme_category_avg_scores[key] = sum(data["scores"]) / data["count"]
+    
+    # Calculate rubric tag scores
+    for i, example in enumerate(eval.examples):
+        if i >= len(example_metadata):
+            continue
+            
+        # Extract rubric item results from metadata
+        rubric_items = example_metadata[i].get("rubric_items", [])
+        
+        for item in rubric_items:
+            tags = item.get("tags", [])
+            score = 1.0 if item.get("criteria_met", False) else 0.0
+            
+            for tag in tags:
+                if tag not in rubric_tag_scores:
+                    rubric_tag_scores[tag] = {"scores": [], "count": 0}
+                
+                rubric_tag_scores[tag]["scores"].append(score)
+                rubric_tag_scores[tag]["count"] += 1
+    
+    # Calculate average for each rubric tag
+    rubric_tag_avg_scores = {}
+    for key, data in rubric_tag_scores.items():
+        if data["count"] > 0:
+            rubric_tag_avg_scores[key] = sum(data["scores"]) / data["count"]
+    
+    # Group scores by prefixes
+    grouped_rubric_tag_scores = {}
+    for tag, score in rubric_tag_avg_scores.items():
+        if ":" in tag:
+            prefix, value = tag.split(":", 1)
+            if prefix not in grouped_rubric_tag_scores:
+                grouped_rubric_tag_scores[prefix] = {}
+            grouped_rubric_tag_scores[prefix][value] = score
+    
     # Save metadata for dashboard
     metadata = {
         "id": date_str,
@@ -674,7 +745,12 @@ def run_custom_eval(
         "metrics_path": str(result_filename),
         "full_results_path": str(full_result_filename),
         # Extract category-specific scores
-        "category_scores": {k: v for k, v in metrics.items() if ':' not in k and k != 'score'}
+        "category_scores": {k: v for k, v in metrics.items() if ':' not in k and k != 'score'},
+        # Add theme-category scores
+        "theme_category_scores": theme_category_avg_scores,
+        # Add rubric tag scores
+        "rubric_tag_scores": rubric_tag_avg_scores,
+        "grouped_rubric_tag_scores": grouped_rubric_tag_scores
     }
     
     # Create metadata directory if it doesn't exist
@@ -706,6 +782,8 @@ def run_custom_eval(
     master_index_path.write_text(json.dumps(index_data, indent=2))
 
     print(f"\nOverall score: {result.score}")
+    print(f"Theme-category pairs found: {len(theme_category_avg_scores)}")
+    print(f"Rubric tags found: {len(rubric_tag_avg_scores)}")
     print(f"Evaluation metadata saved to dashboard system")
     return result
 

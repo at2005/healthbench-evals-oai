@@ -13,6 +13,9 @@
     .chart-container {
         height: 400px;
     }
+    .nav-pills {
+        margin-bottom: 20px;
+    }
 </style>
 {% endblock %}
 
@@ -61,66 +64,255 @@
     </div>
 </div>
 
-<div class="card mb-4">
-    <div class="card-body">
-        <h5 class="card-title">Overall Score Comparison</h5>
-        <div class="chart-container">
-            <canvas id="overallScoreChart"></canvas>
+<!-- Compare Tab Navigation -->
+<ul class="nav nav-pills mb-4" id="compare-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="overall-tab" data-bs-toggle="pill" data-bs-target="#overall" type="button" role="tab" aria-controls="overall" aria-selected="true">Overall Scores</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="category-tab" data-bs-toggle="pill" data-bs-target="#category" type="button" role="tab" aria-controls="category" aria-selected="false">Category Scores</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="theme-category-tab" data-bs-toggle="pill" data-bs-target="#theme-category" type="button" role="tab" aria-controls="theme-category" aria-selected="false">Theme/Category</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="rubric-tag-tab" data-bs-toggle="pill" data-bs-target="#rubric-tag" type="button" role="tab" aria-controls="rubric-tag" aria-selected="false">Rubric Tags</button>
+    </li>
+</ul>
+
+<div class="tab-content" id="compare-tabContent">
+    <!-- Overall Score Tab -->
+    <div class="tab-pane fade show active" id="overall" role="tabpanel" aria-labelledby="overall-tab">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Overall Score Comparison</h5>
+                <div class="chart-container">
+                    <canvas id="overallScoreChart"></canvas>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-
-<div class="card">
-    <div class="card-body">
-        <h5 class="card-title">Category Scores Comparison</h5>
-        
-        {% set all_categories = [] %}
-        {% for eval in evaluations %}
-            {% for category in eval.category_scores.keys() %}
-                {% if category not in all_categories %}
-                    {% set _ = all_categories.append(category) %}
-                {% endif %}
-            {% endfor %}
-        {% endfor %}
-        
-        {% if all_categories %}
-        <div class="table-responsive">
-            <table class="table table-striped comparison-table">
-                <thead>
-                    <tr>
-                        <th>Category</th>
-                        {% for eval in evaluations %}
-                        <th>{{ eval.model }}</th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for category in all_categories %}
-                    <tr>
-                        <td>{{ category }}</td>
-                        {% for eval in evaluations %}
-                        <td>
-                            {% if category in eval.category_scores %}
-                            <span class="badge rounded-pill {% if eval.category_scores[category] >= 0.8 %}bg-success{% elif eval.category_scores[category] >= 0.6 %}bg-warning{% else %}bg-danger{% endif %}">
-                                {{ "%.2f"|format(eval.category_scores[category]) }}
-                            </span>
-                            {% else %}
-                            <span class="badge bg-secondary">N/A</span>
-                            {% endif %}
-                        </td>
-                        {% endfor %}
-                    </tr>
+    
+    <!-- Category Scores Tab -->
+    <div class="tab-pane fade" id="category" role="tabpanel" aria-labelledby="category-tab">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Category Scores Comparison</h5>
+                
+                {% set all_categories = [] %}
+                {% for eval in evaluations %}
+                    {% for category in eval.category_scores.keys() %}
+                        {% if category not in all_categories %}
+                            {% set _ = all_categories.append(category) %}
+                        {% endif %}
                     {% endfor %}
-                </tbody>
-            </table>
+                {% endfor %}
+                
+                {% if all_categories %}
+                <div class="table-responsive">
+                    <table class="table table-striped comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                {% for eval in evaluations %}
+                                <th>{{ eval.model }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for category in all_categories %}
+                            <tr>
+                                <td>{{ category }}</td>
+                                {% for eval in evaluations %}
+                                <td>
+                                    {% if category in eval.category_scores %}
+                                    <span class="badge rounded-pill {% if eval.category_scores[category] >= 0.8 %}bg-success{% elif eval.category_scores[category] >= 0.6 %}bg-warning{% else %}bg-danger{% endif %}">
+                                        {{ "%.2f"|format(eval.category_scores[category]) }}
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">N/A</span>
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="chart-container mt-4">
+                    <canvas id="categoryComparisonChart"></canvas>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">No category scores available for comparison.</div>
+                {% endif %}
+            </div>
         </div>
-        
-        <div class="chart-container mt-4">
-            <canvas id="categoryComparisonChart"></canvas>
+    </div>
+    
+    <!-- Theme/Category Tab -->
+    <div class="tab-pane fade" id="theme-category" role="tabpanel" aria-labelledby="theme-category-tab">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Theme/Category Comparison</h5>
+                
+                {% set all_theme_categories = [] %}
+                {% for eval in evaluations %}
+                    {% if eval.theme_category_scores %}
+                        {% for theme_cat in eval.theme_category_scores.keys() %}
+                            {% if theme_cat not in all_theme_categories %}
+                                {% set _ = all_theme_categories.append(theme_cat) %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+                
+                {% if all_theme_categories %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill"></i> 
+                    These scores show performance on examples with specific theme/category combinations across models.
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-striped comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Theme/Category</th>
+                                {% for eval in evaluations %}
+                                <th>{{ eval.model }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for theme_cat in all_theme_categories %}
+                            <tr>
+                                <td>{{ theme_cat }}</td>
+                                {% for eval in evaluations %}
+                                <td>
+                                    {% if eval.theme_category_scores and theme_cat in eval.theme_category_scores %}
+                                    <span class="badge rounded-pill {% if eval.theme_category_scores[theme_cat] >= 0.8 %}bg-success{% elif eval.theme_category_scores[theme_cat] >= 0.6 %}bg-warning{% else %}bg-danger{% endif %}">
+                                        {{ "%.2f"|format(eval.theme_category_scores[theme_cat]) }}
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">N/A</span>
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="chart-container mt-4">
+                    <canvas id="themeComparisonChart"></canvas>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">No theme/category scores available for comparison.</div>
+                {% endif %}
+            </div>
         </div>
-        {% else %}
-        <div class="alert alert-warning">No category scores available for comparison.</div>
-        {% endif %}
+    </div>
+    
+    <!-- Rubric Tag Tab -->
+    <div class="tab-pane fade" id="rubric-tag" role="tabpanel" aria-labelledby="rubric-tag-tab">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Rubric Tag Comparison</h5>
+                
+                {% set tag_groups = [] %}
+                {% for eval in evaluations %}
+                    {% if eval.grouped_rubric_tag_scores %}
+                        {% for group in eval.grouped_rubric_tag_scores.keys() %}
+                            {% if group not in tag_groups %}
+                                {% set _ = tag_groups.append(group) %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+                
+                {% if tag_groups %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill"></i> 
+                    These scores show how well the models met criteria with specific tags.
+                </div>
+                
+                <ul class="nav nav-pills mb-3" id="tag-compare-tab" role="tablist">
+                    {% for group in tag_groups %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if loop.first %}active{% endif %}" 
+                                id="tag-group-{{ group }}-tab" 
+                                data-bs-toggle="pill" 
+                                data-bs-target="#tag-group-{{ group }}" 
+                                type="button" 
+                                role="tab" 
+                                aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
+                            {{ group }}
+                        </button>
+                    </li>
+                    {% endfor %}
+                </ul>
+                
+                <div class="tab-content" id="tag-compare-tabContent">
+                    {% for group in tag_groups %}
+                    <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
+                         id="tag-group-{{ group }}" 
+                         role="tabpanel" 
+                         aria-labelledby="tag-group-{{ group }}-tab">
+                        
+                        {% set group_tags = [] %}
+                        {% for eval in evaluations %}
+                            {% if eval.grouped_rubric_tag_scores and group in eval.grouped_rubric_tag_scores %}
+                                {% for tag in eval.grouped_rubric_tag_scores[group].keys() %}
+                                    {% if tag not in group_tags %}
+                                        {% set _ = group_tags.append(tag) %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        <div class="table-responsive">
+                            <table class="table table-striped comparison-table">
+                                <thead>
+                                    <tr>
+                                        <th>{{ group }}</th>
+                                        {% for eval in evaluations %}
+                                        <th>{{ eval.model }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for tag in group_tags %}
+                                    <tr>
+                                        <td>{{ tag }}</td>
+                                        {% for eval in evaluations %}
+                                        <td>
+                                            {% if eval.grouped_rubric_tag_scores and group in eval.grouped_rubric_tag_scores and tag in eval.grouped_rubric_tag_scores[group] %}
+                                            <span class="badge rounded-pill {% if eval.grouped_rubric_tag_scores[group][tag] >= 0.8 %}bg-success{% elif eval.grouped_rubric_tag_scores[group][tag] >= 0.6 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                {{ "%.2f"|format(eval.grouped_rubric_tag_scores[group][tag]) }}
+                                            </span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="chart-container mt-4">
+                            <canvas id="tagGroup{{ group }}Chart"></canvas>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-warning">No rubric tag scores available for comparison.</div>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 
@@ -177,7 +369,7 @@
         });
         
         // Category comparison chart
-        const allCategories = {{ all_categories|tojson }};
+        const allCategories = {{ all_categories|default([])|tojson }};
         
         if (allCategories.length > 0) {
             const ctxCategory = document.getElementById('categoryComparisonChart').getContext('2d');
@@ -187,8 +379,8 @@
             datasets.push({
                 label: '{{ eval.model }}',
                 data: allCategories.map(category => {
-                    return {{ eval.category_scores|tojson }}.hasOwnProperty(category) 
-                           ? {{ eval.category_scores|tojson }}[category] 
+                    return {{ eval.category_scores|default({})|tojson }}.hasOwnProperty(category) 
+                           ? {{ eval.category_scores|default({})|tojson }}[category] 
                            : null;
                 }),
                 backgroundColor: '{{ "rgba(40, 167, 69, 0.7)" if eval.score >= 0.8 else "rgba(255, 193, 7, 0.7)" if eval.score >= 0.6 else "rgba(220, 53, 69, 0.7)" }}',
@@ -219,6 +411,114 @@
                 }
             });
         }
+        
+        // Theme/Category comparison chart
+        const allThemeCategories = {{ all_theme_categories|default([])|tojson }};
+        
+        if (allThemeCategories.length > 0) {
+            const ctxTheme = document.getElementById('themeComparisonChart').getContext('2d');
+            
+            const themeDatasets = [];
+            {% for eval in evaluations %}
+            themeDatasets.push({
+                label: '{{ eval.model }}',
+                data: allThemeCategories.map(theme_cat => {
+                    return {{ eval.theme_category_scores|default({})|tojson }}.hasOwnProperty(theme_cat) 
+                           ? {{ eval.theme_category_scores|default({})|tojson }}[theme_cat] 
+                           : null;
+                }),
+                backgroundColor: '{{ "rgba(40, 167, 69, 0.7)" if eval.score >= 0.8 else "rgba(255, 193, 7, 0.7)" if eval.score >= 0.6 else "rgba(220, 53, 69, 0.7)" }}',
+                borderColor: '{{ "rgb(40, 167, 69)" if eval.score >= 0.8 else "rgb(255, 193, 7)" if eval.score >= 0.6 else "rgb(220, 53, 69)" }}',
+                borderWidth: 1,
+                fill: false
+            });
+            {% endfor %}
+            
+            new Chart(ctxTheme, {
+                type: 'bar',
+                data: {
+                    labels: allThemeCategories,
+                    datasets: themeDatasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 1,
+                            title: {
+                                display: true,
+                                text: 'Score'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 90,
+                                minRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Tag group charts
+        {% for group in tag_groups|default([]) %}
+        (function() {
+            const groupTags = {{ group_tags|default([])|tojson }};
+            if (document.getElementById('tagGroup{{ group }}Chart')) {
+                const ctxTag = document.getElementById('tagGroup{{ group }}Chart').getContext('2d');
+                
+                const tagDatasets = [];
+                {% for eval in evaluations %}
+                tagDatasets.push({
+                    label: '{{ eval.model }}',
+                    data: groupTags.map(tag => {
+                        return {{ eval.grouped_rubric_tag_scores|default({})|tojson }}.hasOwnProperty('{{ group }}') && 
+                               {{ eval.grouped_rubric_tag_scores|default({})|tojson }}['{{ group }}'].hasOwnProperty(tag) 
+                               ? {{ eval.grouped_rubric_tag_scores|default({})|tojson }}['{{ group }}'][tag] 
+                               : null;
+                    }),
+                    backgroundColor: '{{ "rgba(40, 167, 69, 0.7)" if eval.score >= 0.8 else "rgba(255, 193, 7, 0.7)" if eval.score >= 0.6 else "rgba(220, 53, 69, 0.7)" }}',
+                    borderColor: '{{ "rgb(40, 167, 69)" if eval.score >= 0.8 else "rgb(255, 193, 7)" if eval.score >= 0.6 else "rgb(220, 53, 69)" }}',
+                    borderWidth: 1,
+                    fill: false
+                });
+                {% endfor %}
+                
+                new Chart(ctxTag, {
+                    type: 'bar',
+                    data: {
+                        labels: groupTags,
+                        datasets: tagDatasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 1,
+                                title: {
+                                    display: true,
+                                    text: 'Score'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    autoSkip: false,
+                                    maxRotation: 90,
+                                    minRotation: 45
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        })();
+        {% endfor %}
     });
 </script>
 {% endif %}

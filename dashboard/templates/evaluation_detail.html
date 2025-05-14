@@ -20,6 +20,23 @@
         background-color: #f8f9fa;
         cursor: pointer;
     }
+    .tag-group-header {
+        font-weight: bold;
+        background-color: #f8f9fa;
+        padding: 10px;
+        margin-top: 15px;
+        border-radius: 5px;
+    }
+    .tag-score-table th {
+        position: sticky;
+        top: 0;
+        background-color: white;
+        z-index: 1;
+    }
+    .score-pill {
+        min-width: 60px;
+        display: inline-block;
+    }
 </style>
 {% endblock %}
 
@@ -67,6 +84,12 @@
         <button class="nav-link active" id="scores-tab" data-bs-toggle="tab" data-bs-target="#scores" type="button" role="tab" aria-controls="scores" aria-selected="true">Category Scores</button>
     </li>
     <li class="nav-item" role="presentation">
+        <button class="nav-link" id="theme-category-tab" data-bs-toggle="tab" data-bs-target="#theme-category" type="button" role="tab" aria-controls="theme-category" aria-selected="false">Theme/Category Scores</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="rubric-tags-tab" data-bs-toggle="tab" data-bs-target="#rubric-tags" type="button" role="tab" aria-controls="rubric-tags" aria-selected="false">Rubric Tag Scores</button>
+    </li>
+    <li class="nav-item" role="presentation">
         <button class="nav-link" id="examples-tab" data-bs-toggle="tab" data-bs-target="#examples" type="button" role="tab" aria-controls="examples" aria-selected="false">Examples</button>
     </li>
     <li class="nav-item" role="presentation">
@@ -90,11 +113,11 @@
                         </span>
                     </div>
                     <div class="progress mt-2">
-                        <div class="progress-bar {% if score >= 0.8 %}bg-success{% elif score >= 0.6 %}bg-warning{% else %}bg-danger{% endif %}" 
-                             role="progressbar" 
-                             style="width: {{ score * 100 }}%;" 
-                             aria-valuenow="{{ score * 100 }}" 
-                             aria-valuemin="0" 
+                        <div class="progress-bar {% if score >= 0.8 %}bg-success{% elif score >= 0.6 %}bg-warning{% else %}bg-danger{% endif %}"
+                             role="progressbar"
+                             style="width: {{ score * 100 }}%;"
+                             aria-valuenow="{{ score * 100 }}"
+                             aria-valuemin="0"
                              aria-valuemax="100">
                             {{ "%.0f%%"|format(score * 100) }}
                         </div>
@@ -104,6 +127,178 @@
             </div>
             {% else %}
             <div class="alert alert-warning">No category scores found.</div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Theme/Category Scores Tab -->
+    <div class="tab-pane fade" id="theme-category" role="tabpanel" aria-labelledby="theme-category-tab">
+        <div class="mt-4">
+            <h3>Theme/Category Scores</h3>
+            {% if eval.theme_category_scores %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill"></i> 
+                    These scores represent the average performance for examples with specific theme/category combinations.
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Theme/Category</th>
+                                <th>Score</th>
+                                <th>Performance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, score in eval.theme_category_scores.items() %}
+                            <tr>
+                                <td><strong>{{ key }}</strong></td>
+                                <td>{{ "%.2f"|format(score) }}</td>
+                                <td>
+                                    <div class="progress">
+                                        <div class="progress-bar {% if score >= 0.8 %}bg-success{% elif score >= 0.6 %}bg-warning{% else %}bg-danger{% endif %}"
+                                             role="progressbar"
+                                             style="width: {{ score * 100 }}%;"
+                                             aria-valuenow="{{ score * 100 }}"
+                                             aria-valuemin="0"
+                                             aria-valuemax="100">
+                                            {{ "%.0f%%"|format(score * 100) }}
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-4 category-chart-container">
+                    <canvas id="themeChart"></canvas>
+                </div>
+            {% else %}
+                <div class="alert alert-warning">No theme/category scores found.</div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Rubric Tag Scores Tab -->
+    <div class="tab-pane fade" id="rubric-tags" role="tabpanel" aria-labelledby="rubric-tags-tab">
+        <div class="mt-4">
+            <h3>Rubric Tag Scores</h3>
+            {% if eval.grouped_rubric_tag_scores %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill"></i> 
+                    These scores represent how well criteria with specific tags were met.
+                </div>
+                
+                <ul class="nav nav-pills mb-3" id="tags-tab" role="tablist">
+                    {% for group_key in eval.grouped_rubric_tag_scores.keys() %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if loop.first %}active{% endif %}" 
+                                id="tag-{{ group_key }}-tab" 
+                                data-bs-toggle="pill" 
+                                data-bs-target="#tag-{{ group_key }}" 
+                                type="button" 
+                                role="tab" 
+                                aria-controls="tag-{{ group_key }}" 
+                                aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
+                            {{ group_key }}
+                        </button>
+                    </li>
+                    {% endfor %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" 
+                                id="tag-all-tab" 
+                                data-bs-toggle="pill" 
+                                data-bs-target="#tag-all" 
+                                type="button" 
+                                role="tab" 
+                                aria-controls="tag-all" 
+                                aria-selected="false">
+                            All Tags
+                        </button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content" id="tags-tabContent">
+                    {% for group_key, tags in eval.grouped_rubric_tag_scores.items() %}
+                    <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
+                         id="tag-{{ group_key }}" 
+                         role="tabpanel" 
+                         aria-labelledby="tag-{{ group_key }}-tab">
+                         
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>{{ group_key }}</th>
+                                        <th>Score</th>
+                                        <th>Performance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for tag, score in tags.items() %}
+                                    <tr>
+                                        <td><strong>{{ tag }}</strong></td>
+                                        <td>{{ "%.2f"|format(score) }}</td>
+                                        <td>
+                                            <div class="progress">
+                                                <div class="progress-bar {% if score >= 0.8 %}bg-success{% elif score >= 0.6 %}bg-warning{% else %}bg-danger{% endif %}"
+                                                     role="progressbar"
+                                                     style="width: {{ score * 100 }}%;" 
+                                                     aria-valuenow="{{ score * 100 }}" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="100">
+                                                    {{ "%.0f%%"|format(score * 100) }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <!-- All Tags Tab -->
+                    <div class="tab-pane fade" id="tag-all" role="tabpanel" aria-labelledby="tag-all-tab">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover tag-score-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tag</th>
+                                        <th>Score</th>
+                                        <th>Performance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for tag, score in eval.rubric_tag_scores.items() %}
+                                    <tr>
+                                        <td><strong>{{ tag }}</strong></td>
+                                        <td>{{ "%.2f"|format(score) }}</td>
+                                        <td>
+                                            <div class="progress">
+                                                <div class="progress-bar {% if score >= 0.8 %}bg-success{% elif score >= 0.6 %}bg-warning{% else %}bg-danger{% endif %}"
+                                                     role="progressbar"
+                                                     style="width: {{ score * 100 }}%;"
+                                                     aria-valuenow="{{ score * 100 }}"
+                                                     aria-valuemin="0"
+                                                     aria-valuemax="100">
+                                                    {{ "%.0f%%"|format(score * 100) }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-warning">No rubric tag scores found.</div>
             {% endif %}
         </div>
     </div>
@@ -180,7 +375,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Get category scores for chart
-        const categoryScores = {{ category_scores|tojson }};
+        const categoryScores = JSON.parse('{{ category_scores|tojson|safe }}');
         
         if (Object.keys(categoryScores).length > 0) {
             const ctx = document.getElementById('categoryChart').getContext('2d');
@@ -230,6 +425,67 @@
                             callbacks: {
                                 label: function(context) {
                                     return `Score: ${context.parsed.y.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Theme/Category chart
+        const themeData = JSON.parse('{{ eval.theme_category_scores|default({})|tojson|safe }}');
+        
+        if (themeData && Object.keys(themeData).length > 0) {
+            const themeCtx = document.getElementById('themeChart').getContext('2d');
+            
+            new Chart(themeCtx, {
+                type: 'horizontalBar',
+                data: {
+                    labels: Object.keys(themeData),
+                    datasets: [{
+                        label: 'Theme/Category Scores',
+                        data: Object.values(themeData),
+                        backgroundColor: Object.values(themeData).map(score => {
+                            if (score >= 0.8) return 'rgba(40, 167, 69, 0.7)';
+                            if (score >= 0.6) return 'rgba(255, 193, 7, 0.7)';
+                            return 'rgba(220, 53, 69, 0.7)';
+                        }),
+                        borderColor: Object.values(themeData).map(score => {
+                            if (score >= 0.8) return 'rgb(40, 167, 69)';
+                            if (score >= 0.6) return 'rgb(255, 193, 7)';
+                            return 'rgb(220, 53, 69)';
+                        }),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 1,
+                            title: {
+                                display: true,
+                                text: 'Score'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                autoSkip: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Score: ${context.parsed.x.toFixed(2)}`;
                                 }
                             }
                         }
