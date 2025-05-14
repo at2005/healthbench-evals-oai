@@ -318,6 +318,11 @@
                                 <span class="ms-3 badge {% if metadata_items[loop.index0].score >= 0.8 %}bg-success{% elif metadata_items[loop.index0].score >= 0.6 %}bg-warning{% else %}bg-danger{% endif %}">
                                     Score: {{ "%.2f"|format(metadata_items[loop.index0].score) }}
                                 </span>
+                                {% if metadata_items[loop.index0].response_metadata and metadata_items[loop.index0].response_metadata.auto_selected_model %}
+                                <span class="ms-2 badge bg-info">
+                                    Model: {{ metadata_items[loop.index0].response_metadata.auto_selected_model }}
+                                </span>
+                                {% endif %}
                             {% endif %}
                         </button>
                     </h2>

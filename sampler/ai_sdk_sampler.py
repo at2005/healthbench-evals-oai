@@ -105,30 +105,33 @@ class AISDKSampler(SamplerBase):
                 response_data = response.json()
 
                 # Handle annotations which might be a list or dictionary
-                auto_select_model = None
+                auto_selected_model = None
                 actual_model = None
                 annotations = response_data.get("annotations")
                 if isinstance(annotations, list):
                     for item in annotations:
                         if isinstance(item, dict):
                             if item.get("type") == "autoSelectedModel":
-                                auto_select_model = item.get("value")
+                                auto_selected_model = item.get("value")
                             elif item.get("type") == "actualModel":
                                 actual_model = item.get("value")
                 
-                print(f"auto_select_model: {auto_select_model}")
+                print(f"auto_selected_model: {auto_selected_model}")
                 
                 # Get usage data and format it to match expected structure
                 usage_data = response_data.get("metadata", {}).get("usage")
                 formatted_usage = self._format_usage_object(usage_data)
                 
+                # Include the auto-selected model info in message metadata for dashboard display
+                response_metadata = {
+                    "usage": formatted_usage,
+                    "auto_selected_model": auto_selected_model,
+                    "actual_model": actual_model
+                }
+                
                 return SamplerResponse(
                     response_text=response_data.get("content", ""),
-                    response_metadata={
-                        "usage": formatted_usage,
-                        "auto_selected_model": auto_select_model,
-                        "actual_model": actual_model
-                    },
+                    response_metadata=response_metadata,
                     actual_queried_message_list=message_list,
                 )
             except requests.exceptions.RequestException as e:

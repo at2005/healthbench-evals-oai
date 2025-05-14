@@ -505,6 +505,7 @@ class HealthBenchEval(Eval):
                 example_level_metadata={
                     "score": score,
                     "usage": get_usage_dict(response_usage),
+                    "response_metadata": response_dict,
                     "rubric_items": rubric_items_with_grades,
                     "prompt": actual_queried_prompt_messages,
                     "completion": [dict(content=response_text, role="assistant")],
