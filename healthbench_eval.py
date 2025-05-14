@@ -542,6 +542,12 @@ def main():
         help="Number of threads to run",
     )
     parser.add_argument(
+        "--n-repeats",
+        type=int,
+        default=1,
+        help="Number of times to repeat each example (for averaging)",
+    )
+    parser.add_argument(
         "--custom_input_path",
         type=str,
         help="Custom path to a local jsonl file containing evaluation examples",
@@ -553,6 +559,7 @@ def main():
             run_reference_completions=False,
             num_examples=args.examples,
             n_threads=args.n_threads or 1,
+            n_repeats=args.n_repeats,
             custom_input_path=args.custom_input_path,
         )
     elif args.run_mode == "physician_completion_references":
@@ -560,6 +567,7 @@ def main():
             run_reference_completions=True,
             num_examples=args.examples,
             n_threads=args.n_threads or 1,
+            n_repeats=args.n_repeats,
             custom_input_path=args.custom_input_path,
         )
     else:
@@ -569,6 +577,7 @@ def main():
                 custom_input_path=args.custom_input_path,
                 num_examples=args.examples,
                 n_threads=args.n_threads or 1,
+                n_repeats=args.n_repeats,
             )
         else:
             raise ValueError(f"Either run_mode or custom_input_path must be specified")
@@ -578,6 +587,7 @@ def run_custom_eval(
     custom_input_path: str,
     num_examples: int | None = None,
     n_threads: int = 120,
+    n_repeats: int = 1,
 ):
     """Run evaluation using a custom input path."""
     now = datetime.now()
@@ -596,7 +606,10 @@ def run_custom_eval(
     # Check if AI SDK environment variables are set
     if os.environ.get("AI_SDK_MODEL"):
         from sampler.ai_sdk_sampler import AISDKSampler
-        print("Using AI SDK sampler with configuration from environment variables")
+        n_repeats_env = int(os.environ.get("AI_SDK_N_REPEATS", "1"))
+        # Use environment n_repeats if it's higher than the argument
+        n_repeats = max(n_repeats, n_repeats_env)
+        print(f"Using AI SDK sampler with configuration from environment variables (n_repeats={n_repeats})")
         sampler = AISDKSampler(
             model=os.environ.get("AI_SDK_MODEL", "gpt-4.1"),
             temperature=float(os.environ.get("AI_SDK_TEMPERATURE", "1.0")),
@@ -617,6 +630,7 @@ def run_custom_eval(
         grader_model=grading_sampler,
         num_examples=num_examples,
         n_threads=n_threads,
+        n_repeats=n_repeats,
         custom_input_path=custom_input_path,
     )
     result = eval(sampler)
@@ -653,6 +667,7 @@ def physician_completions_main(
     run_reference_completions: bool = False,
     num_examples: int | None = None,
     n_threads: int = 120,
+    n_repeats: int = 1,
     custom_input_path: str | None = None,
 ):
     now = datetime.now()
@@ -684,6 +699,7 @@ def physician_completions_main(
             run_reference_completions=run_reference_completions,
             num_examples=num_examples,
             n_threads=n_threads,
+            n_repeats=n_repeats,
             custom_input_path=custom_input_path,
         )
         result = eval(dummy_sampler)

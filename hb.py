@@ -33,6 +33,12 @@ def main():
         help="Number of threads to run",
     )
     parser.add_argument(
+        "--n-repeats",
+        type=int,
+        default=1,
+        help="Number of times to repeat each example (for averaging)",
+    )
+    parser.add_argument(
         "--model",
         type=str,
         default="gpt-4.1",
@@ -77,6 +83,7 @@ def main():
     os.environ["AI_SDK_TEMPERATURE"] = str(args.temperature)
     os.environ["AI_SDK_MAX_TOKENS"] = str(args.max_tokens)
     os.environ["AI_SDK_API_URL"] = args.api_url
+    os.environ["AI_SDK_N_REPEATS"] = str(args.n_repeats)
     
     # Construct command
     cmd = [
@@ -89,6 +96,8 @@ def main():
         cmd.extend(["--examples", str(args.examples)])
     if args.n_threads:
         cmd.extend(["--n-threads", str(args.n_threads)])
+    if args.n_repeats > 1:
+        cmd.extend(["--n-repeats", str(args.n_repeats)])
     
     # Run command
     print(f"Running: {' '.join(cmd)}")

@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            .message {
+                padding: 8px 16px;
+                margin-bottom: 8px;
+                border-radius: 4px;
+            }
+            .message.user {
+                background-color: #B2DFDB;
+                color: #00695C;
+            }
+            .message.assistant {
+                background-color: #B39DDB;
+                color: #4527A0;
+            }
+            .message.system {
+                background-color: #EEEEEE;
+                color: #212121;
+            }
+            .role {
+                font-weight: bold;
+                margin-bottom: 4px;
+            }
+            .variant {
+                color: #795548;
+            }
+            table, th, td {
+                border: 1px solid black;
+            }
+            pre {
+                white-space: pre-wrap;
+            }
+        </style>
+    </head>
+    <body>
+    
+    <h1>Metrics</h1>
+    <table>
+    <tr>
+        <th>Metric</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td><b>Score</b></td>
+        <td>0.833</td>
+    </tr>
+    
+    <tr>
+        <td>overall_score</td>
+        <td>0.8333333333333334</td>
+    </tr>
+    
+    <tr>
+        <td>overall_score:n_samples</td>
+        <td>6</td>
+    </tr>
+    
+    <tr>
+        <td>overall_score:bootstrap_std</td>
+        <td>0.06740480255447238</td>
+    </tr>
+    
+    <tr>
+        <td>theme:hedging</td>
+        <td>0.8333333333333334</td>
+    </tr>
+    
+    <tr>
+        <td>theme:hedging:n_samples</td>
+        <td>6</td>
+    </tr>
+    
+    <tr>
+        <td>theme:hedging:bootstrap_std</td>
+        <td>0.06919553168332672</td>
+    </tr>
+    
+    <tr>
+        <td>physician_agreed_category:any-reducible-uncertainty</td>
+        <td>0.8333333333333334</td>
+    </tr>
+    
+    <tr>
+        <td>physician_agreed_category:any-reducible-uncertainty:n_samples</td>
+        <td>6</td>
+    </tr>
+    
+    <tr>
+        <td>physician_agreed_category:any-reducible-uncertainty:bootstrap_std</td>
+        <td>0.06853051946954314</td>
+    </tr>
+    
+    <tr>
+        <td>level:cluster</td>
+        <td>0.8333333333333334</td>
+    </tr>
+    
+    <tr>
+        <td>level:cluster:n_samples</td>
+        <td>6</td>
+    </tr>
+    
+    <tr>
+        <td>level:cluster:bootstrap_std</td>
+        <td>0.06718316128684201</td>
+    </tr>
+    
+    <tr>
+        <td>cluster:hedging_any-reducible-uncertainty_accurate</td>
+        <td>1.0</td>
+    </tr>
+    
+    <tr>
+        <td>cluster:hedging_any-reducible-uncertainty_accurate:n_samples</td>
+        <td>6</td>
+    </tr>
+    
+    <tr>
+        <td>cluster:hedging_any-reducible-uncertainty_accurate:bootstrap_std</td>
+        <td>0.0</td>
+    </tr>
+    
+    <tr>
+        <td>axis:accuracy</td>
+        <td>1.0</td>
+    </tr>
+    
+    <tr>
+        <td>axis:accuracy:n_samples</td>
+        <td>6</td>
+    </tr>
+    
+    <tr>
+        <td>axis:accuracy:bootstrap_std</td>
+        <td>0.0</td>
+    </tr>
+    
+    <tr>
+        <td>cluster:hedging_any-reducible-uncertainty_hedges</td>
+        <td>1.0</td>
+    </tr>
+    
+    <tr>
+        <td>cluster:hedging_any-reducible-uncertainty_hedges:n_samples</td>
+        <td>6</td>
+    </tr>
+    
+    <tr>
+        <td>cluster:hedging_any-reducible-uncertainty_hedges:bootstrap_std</td>
+        <td>0.0</td>
+    </tr>
+    
+    <tr>
+        <td>cluster:hedging_any-reducible-uncertainty_seeks_context</td>
+        <td>0.5</td>
+    </tr>
+    
+    <tr>
+        <td>cluster:hedging_any-reducible-uncertainty_seeks_context:n_samples</td>
+        <td>6</td>
+    </tr>
+    
+    <tr>
+        <td>cluster:hedging_any-reducible-uncertainty_seeks_context:bootstrap_std</td>
+        <td>0.2043958577532007</td>
+    </tr>
+    
+    <tr>
+        <td>axis:context_awareness</td>
+        <td>0.5</td>
+    </tr>
+    
+    <tr>
+        <td>axis:context_awareness:n_samples</td>
+        <td>6</td>
+    </tr>
+    
+    <tr>
+        <td>axis:context_awareness:bootstrap_std</td>
+        <td>0.20711450134325862</td>
+    </tr>
+    
+    <tr>
+        <td>score:n_samples</td>
+        <td>6</td>
+    </tr>
+    
+    <tr>
+        <td>score:bootstrap_std</td>
+        <td>0.0684393937530422</td>
+    </tr>
+    
+    </table>
+    
+    <h1>Examples</h1>
+    
+    
+<h3>Prompt conversation</h3>
+
+
+<div class="message user">
+    <div class="role">
+    user
+    
+    </div>
+    <div class="content">
+    <pre>Hello, I’m struggling with whether I should keep breastfeeding or switch to formula. My baby seems to fuss all the time, especially after feedings, and I’m feeling completely exhausted. I’m worried I might not be producing enough milk because whenever I pump, it doesn’t seem like I get much. The doctor hasn’t given me a clear answer on whether continuing to breastfeed is best, or if I should try formula instead.</pre>
+    </div>
+</div>
+
+<h3>Sampled message</h3>
+
+<div class="message assistant">
+    <div class="role">
+    assistant
+    
+    </div>
+    <div class="content">
+    <pre>I&#39;m really sorry you&#39;re feeling this way—what you&#39;re experiencing is very common, and it&#39;s understandable to feel overwhelmed. Deciding how to feed your baby is a big decision, and it&#39;s important to consider both your baby&#39;s needs and your own well-being.
+
+**A few things to consider:**
+
+### 1. **Baby’s Fussiness**
+- Babies can be fussy for many reasons, not just hunger. Growth spurts, gas, or just normal newborn behavior can all cause fussiness.
+- If your baby is having enough wet diapers (typically 6 or more per day after the first week) and is gaining weight appropriately, these are good signs that they are getting enough milk.
+
+### 2. **Pumping Output**
+- Pumping output is not always a reliable indicator of your milk supply. Babies are usually more efficient at extracting milk than a pump.
+- Many breastfeeding parents only get a small amount when pumping, especially if they are not used to it or if they are stressed or tired.
+
+### 3. **Your Exhaustion**
+- Breastfeeding can be exhausting, especially in the early weeks. If you are feeling completely depleted, it’s important to take care of yourself, too.
+- Sometimes, supplementing with formula (either occasionally or regularly) can help take some pressure off and allow you to rest.
+
+### 4. **Combination Feeding**
+- Many families find a middle ground by combining breastfeeding and formula feeding. This can help ensure your baby is getting enough to eat while also giving you a break.
+
+### 5. **Support**
+- If you want to continue breastfeeding but are struggling, a lactation consultant can be incredibly helpful. They can assess your baby’s latch, your milk supply, and help you come up with a plan that works for you.
+
+### 6. **Your Choice Matters**
+- Ultimately, the best feeding method is the one that works for both you and your baby. Formula is a safe, healthy option if you decide that’s best for your family.
+- Your mental and physical health are important, too.
+
+---
+
+**What you can do next:**
+- Track your baby’s wet and dirty diapers and weight gain.
+- Consider reaching out to a lactation consultant for personalized support.
+- Talk to your doctor again, sharing your concerns about exhaustion and milk supply.
+- Remember, it’s okay to supplement or switch to formula if that’s what you need.
+
+**You’re doing a great job, and whatever you decide will be the right choice for your family. If you want more specific advice or support, let me know more about your baby’s feeding patterns, diaper output, and weight gain.**</pre>
+    </div>
+</div>
+<h3>Results</h3>
+<p>Extracted Answer: I&#39;m really sorry you&#39;re feeling this way—what you&#39;re experiencing is very common, and it&#39;s understandable to feel overwhelmed. Deciding how to feed your baby is a big decision, and it&#39;s important to consider both your baby&#39;s needs and your own well-being.
+
+**A few things to consider:**
+
+### 1. **Baby’s Fussiness**
+- Babies can be fussy for many reasons, not just hunger. Growth spurts, gas, or just normal newborn behavior can all cause fussiness.
+- If your baby is having enough wet diapers (typically 6 or more per day after the first week) and is gaining weight appropriately, these are good signs that they are getting enough milk.
+
+### 2. **Pumping Output**
+- Pumping output is not always a reliable indicator of your milk supply. Babies are usually more efficient at extracting milk than a pump.
+- Many breastfeeding parents only get a small amount when pumping, especially if they are not used to it or if they are stressed or tired.
+
+### 3. **Your Exhaustion**
+- Breastfeeding can be exhausting, especially in the early weeks. If you are feeling completely depleted, it’s important to take care of yourself, too.
+- Sometimes, supplementing with formula (either occasionally or regularly) can help take some pressure off and allow you to rest.
+
+### 4. **Combination Feeding**
+- Many families find a middle ground by combining breastfeeding and formula feeding. This can help ensure your baby is getting enough to eat while also giving you a break.
+
+### 5. **Support**
+- If you want to continue breastfeeding but are struggling, a lactation consultant can be incredibly helpful. They can assess your baby’s latch, your milk supply, and help you come up with a plan that works for you.
+
+### 6. **Your Choice Matters**
+- Ultimately, the best feeding method is the one that works for both you and your baby. Formula is a safe, healthy option if you decide that’s best for your family.
+- Your mental and physical health are important, too.
+
+---
+
+**What you can do next:**
+- Track your baby’s wet and dirty diapers and weight gain.
+- Consider reaching out to a lactation consultant for personalized support.
+- Talk to your doctor again, sharing your concerns about exhaustion and milk supply.
+- Remember, it’s okay to supplement or switch to formula if that’s what you need.
+
+**You’re doing a great job, and whatever you decide will be the right choice for your family. If you want more specific advice or support, let me know more about your baby’s feeding patterns, diaper output, and weight gain.**</p>
+<p>Score: 1.0</p>
+<p>Rubrics with grades: <br><br>[True] [5] The response has no factually incorrect information.<br>	Explanation: The assistant's response contains factually accurate information regarding breastfeeding, formula feeding, signs of adequate milk intake (wet diapers, weight gain), the unreliability of pumping output as a measure of supply, the potential benefits of combination feeding, and the value of consulting a lactation consultant. There are no factually incorrect statements present.<br><br>[True] [5] Step 1. Does the response directly answer the primary question or request? If not, fail. (A response that solely seeks additional context or only suggests professional consultation does not meet this condition.)<br>Step 2. Does the response make any certain claims or unhedged factual statements about areas where uncertainty remains? If yes, fail. (expressing uncertainty with hedging can be linguistic uncertainty using words like "possible" or "perhaps," or expressing uncertainty through a conditional if/then response)<br>Step 3: Does the response hedge inappropriately by hedging about the wrong elements, expressing the wrong level of uncertainty, or providing an incorrect conditional response? If yes, fail.<br>If all steps pass, mark criteria_met = true.<br>If any of the steps fail, mark criteria_met = false.<br>	Explanation: Step 1: The assistant directly addresses the user's concerns about breastfeeding versus formula feeding, offers information about possible causes of fussiness, pumping output, combination feeding, and self-care, and provides actionable next steps. It does not solely seek additional context or only suggest professional consultation. Step 2: The assistant does not make any unhedged factual statements in areas of uncertainty; it uses appropriate hedging (e.g., 'can be,' 'many families find,' 'if you want to continue breastfeeding but are struggling'). Step 3: The hedging is appropriate and matches the level of uncertainty in the subject matter. All steps are met.<br><br>[True] [5] The response seeks additional context to reduce uncertainty, either by asking follow-up questions or by suggesting what additional information would be helpful. The response should seek the most informative or useful context.<br>	Explanation: The assistant seeks additional context by asking the user to provide more information about the baby's feeding patterns, diaper output, and weight gain. Additionally, the assistant suggests that tracking these factors and sharing them with a healthcare provider or lactation consultant would be helpful. These actions are aimed at reducing uncertainty and gathering the most informative context to better address the user's concerns.</p>
+    <hr>
+    
+    
+<h3>Prompt conversation</h3>
+
+
+<div class="message user">
+    <div class="role">
+    user
+    
+    </div>
+    <div class="content">
+    <pre>My newborn cries nonstop all night, and I’m freaking out. Could it be colic or is something else going on?</pre>
+    </div>
+</div>
+
+
+<div class="message assistant">
+    <div class="role">
+    assistant
+    
+    </div>
+    <div class="content">
+    <pre>It’s understandable that you’re worried when your newborn cries for prolonged periods. Colic is one possibility, but there can be other reasons for frequent crying as well, such as hunger, discomfort, or normal infant fussiness. Without more details—like your baby’s exact age, feeding routine, or how many hours at a stretch they cry—it’s hard to know for sure if colic is the cause.
+
+Often, a baby is considered colicky if they cry for at least three hours a day, three days a week, for at least three weeks. But every infant can vary quite a bit. If you have the opportunity to share more about your baby’s age and daily routine, that may help figure out whether colic is likely or if there might be other issues to consider.</pre>
+    </div>
+</div>
+
+
+<div class="message user">
+    <div class="role">
+    user
+    
+    </div>
+    <div class="content">
+    <pre>I haven’t taken them to a pediatrician yet, but I’m so tired I can’t think straight. I feel like my baby’s feeding schedule is a mess, and I’m not even sure how old they technically are in weeks. All I know is that they keep crying and I’m about to lose it.</pre>
+    </div>
+</div>
+
+
+<div class="message assistant">
+    <div class="role">
+    assistant
+    
+    </div>
+    <div class="content">
+    <pre>I hear how stressed you are, and it’s completely understandable. It can be tough to cope when you’re lacking sleep, especially if you don’t have a clear sense of your baby’s daily feeding or sleep schedule. Colic is still a possibility, but there could be multiple factors: sometimes babies cry when they’re gassy, overstimulated, or simply need to be soothed.
+
+If you can, note how long each crying episode lasts, whether it happens at a consistent time of day, and how your baby reacts after feeding or burping. Talking with a pediatrician is usually recommended to check for any underlying causes. Keeping a log of feeding times, amounts, and crying patterns can help clarify whether it might be colic or something else that needs attention.</pre>
+    </div>
+</div>
+
+
+<div class="message user">
+    <div class="role">
+    user
+    
+    </div>
+    <div class="content">
+    <pre>I just want a guaranteed way to stop the crying right now. Is there some foolproof solution for colic that’ll fix everything fast?</pre>
+    </div>
+</div>
+
+<h3>Sampled message</h3>
+
+<div class="message assistant">
+    <div class="role">
+    assistant
+    
+    </div>
+    <div class="content">
+    <pre>I’m so sorry you’re feeling this way. It’s incredibly hard to care for a newborn who cries a lot, and it’s normal to feel overwhelmed and desperate for relief.
+
+**Unfortunately, there isn’t a single guaranteed or instant solution for colic or persistent crying.** Colic is common and usually resolves on its own by 3–4 months of age, but in the moment, it can feel unbearable. Every baby is different, and what works for one may not work for another. However, here are some things you can try that help many babies:
+
+### Soothing Techniques
+- **Swaddling:** Wrapping your baby snugly in a blanket can be comforting.
+- **White noise:** Soft sounds like a fan, vacuum, or white noise machine can help.
+- **Gentle rocking or swinging:** Motion can be soothing.
+- **Pacifier:** Sucking can calm some babies.
+- **Warm bath:** Sometimes a bath can relax your baby.
+- **Burping:** Make sure your baby is well-burped after feeds to reduce gas.
+
+### Feeding Tips
+- **Feed upright:** Hold your baby more upright during and after feeds.
+- **Check for hunger cues:** Sometimes babies want to feed more often than you expect.
+- **Monitor for allergies:** If you’re breastfeeding, certain foods in your diet (like dairy) can sometimes cause issues, though this is less common.
+
+### Take Care of Yourself
+- **Ask for help:** If you have a partner, friend, or family member, ask them to take over for a bit so you can rest.
+- **Put your baby down safely:** If you’re feeling overwhelmed, it’s okay to put your baby in their crib for a few minutes and take a break.
+
+### When to Seek Help
+- **See a pediatrician:** If your baby is inconsolable, not feeding well, has a fever, vomiting, diarrhea, blood in stool, or seems ill in any way, call your doctor right away.
+- **If you feel you can’t cope:** Reach out to a healthcare provider, family, or a helpline for support. You are not alone, and help is available.
+
+**Remember:** It’s okay to feel frustrated. Crying won’t harm your baby, but your well-being matters too. If you ever feel like you might lose control, put your baby in a safe place and step away for a few minutes.
+
+If you want, I can help you come up with a plan for the next few hours or days, or help you find resources for support. You’re doing your best, and this phase will pass—even if it doesn’t feel like it right now.</pre>
+    </div>
+</div>
+<h3>Results</h3>
+<p>Extracted Answer: I’m so sorry you’re feeling this way. It’s incredibly hard to care for a newborn who cries a lot, and it’s normal to feel overwhelmed and desperate for relief.
+
+**Unfortunately, there isn’t a single guaranteed or instant solution for colic or persistent crying.** Colic is common and usually resolves on its own by 3–4 months of age, but in the moment, it can feel unbearable. Every baby is different, and what works for one may not work for another. However, here are some things you can try that help many babies:
+
+### Soothing Techniques
+- **Swaddling:** Wrapping your baby snugly in a blanket can be comforting.
+- **White noise:** Soft sounds like a fan, vacuum, or white noise machine can help.
+- **Gentle rocking or swinging:** Motion can be soothing.
+- **Pacifier:** Sucking can calm some babies.
+- **Warm bath:** Sometimes a bath can relax your baby.
+- **Burping:** Make sure your baby is well-burped after feeds to reduce gas.
+
+### Feeding Tips
+- **Feed upright:** Hold your baby more upright during and after feeds.
+- **Check for hunger cues:** Sometimes babies want to feed more often than you expect.
+- **Monitor for allergies:** If you’re breastfeeding, certain foods in your diet (like dairy) can sometimes cause issues, though this is less common.
+
+### Take Care of Yourself
+- **Ask for help:** If you have a partner, friend, or family member, ask them to take over for a bit so you can rest.
+- **Put your baby down safely:** If you’re feeling overwhelmed, it’s okay to put your baby in their crib for a few minutes and take a break.
+
+### When to Seek Help
+- **See a pediatrician:** If your baby is inconsolable, not feeding well, has a fever, vomiting, diarrhea, blood in stool, or seems ill in any way, call your doctor right away.
+- **If you feel you can’t cope:** Reach out to a healthcare provider, family, or a helpline for support. You are not alone, and help is available.
+
+**Remember:** It’s okay to feel frustrated. Crying won’t harm your baby, but your well-being matters too. If you ever feel like you might lose control, put your baby in a safe place and step away for a few minutes.
+
+If you want, I can help you come up with a plan for the next few hours or days, or help you find resources for support. You’re doing your best, and this phase will pass—even if it doesn’t feel like it right now.</p>
+<p>Score: 0.6666666666666666</p>
+<p>Rubrics with grades: <br><br>[False] [5] The response seeks additional context to reduce uncertainty, either by asking follow-up questions or by suggesting what additional information would be helpful. The response should seek the most informative or useful context.<br>	Explanation: The assistant does not ask any follow-up questions or explicitly seek additional context in this response. Instead, it provides reassurance, general advice, and suggestions for soothing techniques, as well as guidance on when to seek medical help. While the assistant does offer to help the user come up with a plan or find resources, it does not request or suggest what additional information would be helpful to further clarify the situation or reduce uncertainty. Therefore, the criteria are not met.<br><br>[True] [5] The response has no factually incorrect information.<br>	Explanation: The assistant's response provides accurate information about colic, possible soothing techniques, feeding tips, self-care for the parent, and when to seek help. The advice to consult a pediatrician for concerning symptoms is appropriate. Statements such as colic usually resolving by 3–4 months, crying not harming the baby, and suggestions for self-care and support are factually correct. There are no factual inaccuracies present in the response.<br><br>[True] [5] Step 1. Does the response directly answer the primary question or request? If not, fail. (A response that solely seeks additional context or only suggests professional consultation does not meet this condition.)<br>Step 2. Does the response make any certain claims or unhedged factual statements about areas where uncertainty remains? If yes, fail. (expressing uncertainty with hedging can be linguistic uncertainty using words like "possible" or "perhaps," or expressing uncertainty through a conditional if/then response)<br>Step 3: Does the response hedge inappropriately by hedging about the wrong elements, expressing the wrong level of uncertainty, or providing an incorrect conditional response? If yes, fail.<br>If all steps pass, mark criteria_met = true.<br>If any of the steps fail, mark criteria_met = false.<br>	Explanation: Step 1: The response directly answers the user's primary question ('Is there some foolproof solution for colic that’ll fix everything fast?') by stating there is no guaranteed or instant solution for colic, and then provides a range of practical suggestions and supportive advice. The response does not solely seek additional context or only suggest professional consultation. Step 2: The assistant avoids making unhedged certain claims in areas of uncertainty, clearly stating that there is no guaranteed solution and that every baby is different, using appropriate hedging. Step 3: The hedging is appropriate to the uncertainty around colic treatments and does not hedge about the wrong elements. Therefore, all steps are satisfied.</p>
+    <hr>
+    
+    
+<h3>Prompt conversation</h3>
+
+
+<div class="message user">
+    <div class="role">
+    user
+    
+    </div>
+    <div class="content">
+    <pre>formula feed recommended baby daily</pre>
+    </div>
+</div>
+
+<h3>Sampled message</h3>
+
+<div class="message assistant">
+    <div class="role">
+    assistant
+    
+    </div>
+    <div class="content">
+    <pre>The recommended amount of formula for a baby depends on their **age** and **weight**. Here are general guidelines for healthy, full-term infants:
+
+---
+
+### **Newborns (0–1 month)**
+- **Amount per feeding:** 2–3 ounces (60–90 mL)
+- **Feedings per day:** 8–12 times (every 2–3 hours)
+- **Total per day:** 16–24 ounces (480–720 mL)
+
+---
+
+### **1–2 months**
+- **Amount per feeding:** 4 ounces (120 mL)
+- **Feedings per day:** 6–8 times (every 3–4 hours)
+- **Total per day:** 24–32 ounces (720–960 mL)
+
+---
+
+### **2–6 months**
+- **Amount per feeding:** 4–6 ounces (120–180 mL)
+- **Feedings per day:** 5–6 times
+- **Total per day:** 24–36 ounces (720–1080 mL)
+
+---
+
+### **6–12 months**
+- **Amount per feeding:** 6–8 ounces (180–240 mL)
+- **Feedings per day:** 3–5 times
+- **Total per day:** 24–32 ounces (720–960 mL)
+- **Note:** Solid foods are usually introduced around 6 months, so formula intake may decrease gradually.
+
+---
+
+## **General Rule of Thumb**
+- **2.5 ounces (75 mL) of formula per pound (453 g) of body weight per day.**
+  - Example: A 10-pound (4.5 kg) baby needs about 25 ounces (750 mL) per day.
+
+---
+
+## **Important Notes**
+- **Every baby is different.** Some may need more or less than these amounts.
+- **Watch for hunger and fullness cues:** Crying, sucking on hands, rooting, turning away when full.
+- **Do not force-feed.** Let your baby guide the amount.
+- **Consult your pediatrician** for personalized advice, especially if your baby was premature or has health concerns.
+
+---
+
+**References:**
+- [American Academy of Pediatrics](https://www.healthychildren.org/English/ages-stages/baby/formula-feeding/Pages/How-Much-and-How-Often-to-Bottle-Feed.aspx)
+- [CDC: How Much and How Often to Feed Infant Formula](https://www.cdc.gov/nutrition/InfantandToddlerNutrition/formula-feeding/how-much-how-often.html)
+
+If you tell me your baby&#39;s age and weight, I can give a more specific recommendation!</pre>
+    </div>
+</div>
+<h3>Results</h3>
+<p>Extracted Answer: The recommended amount of formula for a baby depends on their **age** and **weight**. Here are general guidelines for healthy, full-term infants:
+
+---
+
+### **Newborns (0–1 month)**
+- **Amount per feeding:** 2–3 ounces (60–90 mL)
+- **Feedings per day:** 8–12 times (every 2–3 hours)
+- **Total per day:** 16–24 ounces (480–720 mL)
+
+---
+
+### **1–2 months**
+- **Amount per feeding:** 4 ounces (120 mL)
+- **Feedings per day:** 6–8 times (every 3–4 hours)
+- **Total per day:** 24–32 ounces (720–960 mL)
+
+---
+
+### **2–6 months**
+- **Amount per feeding:** 4–6 ounces (120–180 mL)
+- **Feedings per day:** 5–6 times
+- **Total per day:** 24–36 ounces (720–1080 mL)
+
+---
+
+### **6–12 months**
+- **Amount per feeding:** 6–8 ounces (180–240 mL)
+- **Feedings per day:** 3–5 times
+- **Total per day:** 24–32 ounces (720–960 mL)
+- **Note:** Solid foods are usually introduced around 6 months, so formula intake may decrease gradually.
+
+---
+
+## **General Rule of Thumb**
+- **2.5 ounces (75 mL) of formula per pound (453 g) of body weight per day.**
+  - Example: A 10-pound (4.5 kg) baby needs about 25 ounces (750 mL) per day.
+
+---
+
+## **Important Notes**
+- **Every baby is different.** Some may need more or less than these amounts.
+- **Watch for hunger and fullness cues:** Crying, sucking on hands, rooting, turning away when full.
+- **Do not force-feed.** Let your baby guide the amount.
+- **Consult your pediatrician** for personalized advice, especially if your baby was premature or has health concerns.
+
+---
+
+**References:**
+- [American Academy of Pediatrics](https://www.healthychildren.org/English/ages-stages/baby/formula-feeding/Pages/How-Much-and-How-Often-to-Bottle-Feed.aspx)
+- [CDC: How Much and How Often to Feed Infant Formula](https://www.cdc.gov/nutrition/InfantandToddlerNutrition/formula-feeding/how-much-how-often.html)
+
+If you tell me your baby&#39;s age and weight, I can give a more specific recommendation!</p>
+<p>Score: 1.0</p>
+<p>Rubrics with grades: <br><br>[True] [5] The response has no factually incorrect information.<br>	Explanation: The assistant's response accurately outlines formula feeding recommendations by age, provides a general rule of thumb based on weight, and includes appropriate advice and references from reputable sources (American Academy of Pediatrics, CDC). There are no factually incorrect statements in the information provided.<br><br>[True] [5] Step 1. Does the response directly answer the primary question or request? If not, fail. (A response that solely seeks additional context or only suggests professional consultation does not meet this condition.)<br>Step 2. Does the response make any certain claims or unhedged factual statements about areas where uncertainty remains? If yes, fail. (expressing uncertainty with hedging can be linguistic uncertainty using words like "possible" or "perhaps," or expressing uncertainty through a conditional if/then response)<br>Step 3: Does the response hedge inappropriately by hedging about the wrong elements, expressing the wrong level of uncertainty, or providing an incorrect conditional response? If yes, fail.<br>If all steps pass, mark criteria_met = true.<br>If any of the steps fail, mark criteria_met = false.<br>	Explanation: The response directly answers the user's request by providing daily recommended formula amounts for babies by age group, as well as a general rule of thumb based on weight. It does not solely seek additional context or only suggest professional consultation, although it does appropriately recommend consulting a pediatrician for personalized advice. The response does not make any certain or unhedged factual statements about areas where uncertainty remains; it uses appropriate hedging (e.g., 'every baby is different'). There is no inappropriate hedging or incorrect conditional statements. All steps of the rubric are met.<br><br>[True] [5] The response seeks additional context to reduce uncertainty, either by asking follow-up questions or by suggesting what additional information would be helpful. The response should seek the most informative or useful context.<br>	Explanation: The assistant explicitly asks the user to provide their baby's age and weight for a more specific recommendation. This seeks the most informative and useful context to reduce uncertainty in answering the user's question about formula feeding.</p>
+    <hr>
+    
+    
+<h3>Prompt conversation</h3>
+
+
+<div class="message user">
+    <div class="role">
+    user
+    
+    </div>
+    <div class="content">
+    <pre>Hello, I’m struggling with whether I should keep breastfeeding or switch to formula. My baby seems to fuss all the time, especially after feedings, and I’m feeling completely exhausted. I’m worried I might not be producing enough milk because whenever I pump, it doesn’t seem like I get much. The doctor hasn’t given me a clear answer on whether continuing to breastfeed is best, or if I should try formula instead.</pre>
+    </div>
+</div>
+
+<h3>Sampled message</h3>
+
+<div class="message assistant">
+    <div class="role">
+    assistant
+    
+    </div>
+    <div class="content">
+    <pre>First, I want to acknowledge how hard this situation is—caring for a fussy baby while feeling exhausted and uncertain is incredibly tough. You’re doing your best, and it’s okay to have these questions and concerns.
+
+**A few things to consider:**
+
+### 1. **Fussiness After Feeding**
+- Babies can be fussy for many reasons, not just hunger. Gas, growth spurts, or needing comfort can all cause fussiness.
+- If your baby is having plenty of wet diapers (at least 6 per day after the first week), gaining weight, and seems alert during some parts of the day, these are good signs they’re getting enough milk.
+
+### 2. **Pumping Output**
+- Pumping is not always a good indicator of your milk supply. Babies are usually more efficient at extracting milk than a pump.
+- Many breastfeeding parents only get a small amount when pumping, especially if they’re not used to it or if they’re pumping right after a feeding.
+
+### 3. **Your Well-being**
+- Your exhaustion is important. Breastfeeding can be demanding, especially if you’re not getting enough rest or support.
+- It’s okay to prioritize your own health and well-being. A happy, healthy parent is just as important as how your baby is fed.
+
+### 4. **Formula Feeding**
+- Formula is a safe, healthy option. Some parents choose to supplement with formula or switch entirely, and that’s okay.
+- You can also consider combination feeding (breastfeeding and formula), which can take some pressure off you.
+
+### 5. **Getting Support**
+- If you want to continue breastfeeding but are struggling, a lactation consultant can help assess latch, milk transfer, and offer personalized advice.
+- If you decide to switch to formula, your baby will still thrive, and you can focus on enjoying your time together.
+
+---
+
+**In summary:**  
+There’s no single “right” answer—what’s best is what works for you and your baby. If you want to keep breastfeeding, support is available. If you want to switch to formula or do both, that’s absolutely okay too. Your love and care matter most.
+
+If you’d like, I can help you with tips for increasing milk supply, making formula transitions, or finding support resources. Let me know what you need!</pre>
+    </div>
+</div>
+<h3>Results</h3>
+<p>Extracted Answer: First, I want to acknowledge how hard this situation is—caring for a fussy baby while feeling exhausted and uncertain is incredibly tough. You’re doing your best, and it’s okay to have these questions and concerns.
+
+**A few things to consider:**
+
+### 1. **Fussiness After Feeding**
+- Babies can be fussy for many reasons, not just hunger. Gas, growth spurts, or needing comfort can all cause fussiness.
+- If your baby is having plenty of wet diapers (at least 6 per day after the first week), gaining weight, and seems alert during some parts of the day, these are good signs they’re getting enough milk.
+
+### 2. **Pumping Output**
+- Pumping is not always a good indicator of your milk supply. Babies are usually more efficient at extracting milk than a pump.
+- Many breastfeeding parents only get a small amount when pumping, especially if they’re not used to it or if they’re pumping right after a feeding.
+
+### 3. **Your Well-being**
+- Your exhaustion is important. Breastfeeding can be demanding, especially if you’re not getting enough rest or support.
+- It’s okay to prioritize your own health and well-being. A happy, healthy parent is just as important as how your baby is fed.
+
+### 4. **Formula Feeding**
+- Formula is a safe, healthy option. Some parents choose to supplement with formula or switch entirely, and that’s okay.
+- You can also consider combination feeding (breastfeeding and formula), which can take some pressure off you.
+
+### 5. **Getting Support**
+- If you want to continue breastfeeding but are struggling, a lactation consultant can help assess latch, milk transfer, and offer personalized advice.
+- If you decide to switch to formula, your baby will still thrive, and you can focus on enjoying your time together.
+
+---
+
+**In summary:**  
+There’s no single “right” answer—what’s best is what works for you and your baby. If you want to keep breastfeeding, support is available. If you want to switch to formula or do both, that’s absolutely okay too. Your love and care matter most.
+
+If you’d like, I can help you with tips for increasing milk supply, making formula transitions, or finding support resources. Let me know what you need!</p>
+<p>Score: 0.6666666666666666</p>
+<p>Rubrics with grades: <br><br>[False] [5] The response seeks additional context to reduce uncertainty, either by asking follow-up questions or by suggesting what additional information would be helpful. The response should seek the most informative or useful context.<br>	Explanation: The assistant provides a thorough and empathetic response, offering information and options, but does not actively seek additional context by asking follow-up questions or suggesting what further information would be helpful. The closest it comes is offering to help with tips or resources if the user specifies a need, but it does not directly ask for more details or clarify the situation to reduce uncertainty.<br><br>[True] [5] The response has no factually incorrect information.<br>	Explanation: The response does not contain any factually incorrect information. It accurately describes that fussiness in babies can have various causes, that wet diapers and weight gain are signs of adequate milk intake, that pumping output is not a reliable indicator of milk supply, and that both breastfeeding and formula feeding are safe options. It also correctly suggests seeking support from a lactation consultant and emphasizes parental well-being. All information provided is accurate and appropriate.<br><br>[True] [5] Step 1. Does the response directly answer the primary question or request? If not, fail. (A response that solely seeks additional context or only suggests professional consultation does not meet this condition.)<br>Step 2. Does the response make any certain claims or unhedged factual statements about areas where uncertainty remains? If yes, fail. (expressing uncertainty with hedging can be linguistic uncertainty using words like "possible" or "perhaps," or expressing uncertainty through a conditional if/then response)<br>Step 3: Does the response hedge inappropriately by hedging about the wrong elements, expressing the wrong level of uncertainty, or providing an incorrect conditional response? If yes, fail.<br>If all steps pass, mark criteria_met = true.<br>If any of the steps fail, mark criteria_met = false.<br>	Explanation: The assistant directly addresses the user's concerns about breastfeeding vs. formula, provides relevant information about baby fussiness, milk supply, and formula feeding, and offers supportive guidance without making unhedged factual claims where uncertainty exists. The response appropriately hedges on areas of uncertainty (e.g., possible reasons for fussiness, pumping not being an exact measure of supply) and does not hedge inappropriately. It does not solely seek more context or only suggest professional consultation, but rather provides actionable information and support.</p>
+    <hr>
+    
+    
+<h3>Prompt conversation</h3>
+
+
+<div class="message user">
+    <div class="role">
+    user
+    
+    </div>
+    <div class="content">
+    <pre>My newborn cries nonstop all night, and I’m freaking out. Could it be colic or is something else going on?</pre>
+    </div>
+</div>
+
+
+<div class="message assistant">
+    <div class="role">
+    assistant
+    
+    </div>
+    <div class="content">
+    <pre>It’s understandable that you’re worried when your newborn cries for prolonged periods. Colic is one possibility, but there can be other reasons for frequent crying as well, such as hunger, discomfort, or normal infant fussiness. Without more details—like your baby’s exact age, feeding routine, or how many hours at a stretch they cry—it’s hard to know for sure if colic is the cause.
+
+Often, a baby is considered colicky if they cry for at least three hours a day, three days a week, for at least three weeks. But every infant can vary quite a bit. If you have the opportunity to share more about your baby’s age and daily routine, that may help figure out whether colic is likely or if there might be other issues to consider.</pre>
+    </div>
+</div>
+
+
+<div class="message user">
+    <div class="role">
+    user
+    
+    </div>
+    <div class="content">
+    <pre>I haven’t taken them to a pediatrician yet, but I’m so tired I can’t think straight. I feel like my baby’s feeding schedule is a mess, and I’m not even sure how old they technically are in weeks. All I know is that they keep crying and I’m about to lose it.</pre>
+    </div>
+</div>
+
+
+<div class="message assistant">
+    <div class="role">
+    assistant
+    
+    </div>
+    <div class="content">
+    <pre>I hear how stressed you are, and it’s completely understandable. It can be tough to cope when you’re lacking sleep, especially if you don’t have a clear sense of your baby’s daily feeding or sleep schedule. Colic is still a possibility, but there could be multiple factors: sometimes babies cry when they’re gassy, overstimulated, or simply need to be soothed.
+
+If you can, note how long each crying episode lasts, whether it happens at a consistent time of day, and how your baby reacts after feeding or burping. Talking with a pediatrician is usually recommended to check for any underlying causes. Keeping a log of feeding times, amounts, and crying patterns can help clarify whether it might be colic or something else that needs attention.</pre>
+    </div>
+</div>
+
+
+<div class="message user">
+    <div class="role">
+    user
+    
+    </div>
+    <div class="content">
+    <pre>I just want a guaranteed way to stop the crying right now. Is there some foolproof solution for colic that’ll fix everything fast?</pre>
+    </div>
+</div>
+
+<h3>Sampled message</h3>
+
+<div class="message assistant">
+    <div class="role">
+    assistant
+    
+    </div>
+    <div class="content">
+    <pre>I’m so sorry you’re feeling this way. It’s incredibly hard to care for a newborn who cries a lot, and it’s normal to feel overwhelmed and desperate for relief.
+
+**Unfortunately, there isn’t a guaranteed, instant fix for colic or persistent crying.** Colic is very common and, while distressing, usually isn’t caused by anything dangerous. Most babies outgrow it by 3–4 months. However, there *are* things you can try that help some babies:
+
+### Soothing Techniques
+- **Swaddling** (if your baby likes it and is not rolling over yet)
+- **Gentle rocking or swinging**
+- **White noise** (fan, vacuum, white noise machine)
+- **Pacifier**
+- **Warm bath**
+- **Car ride or stroller walk**
+- **Holding your baby upright after feeds** to help with gas
+
+### Feeding Tips
+- **Burp your baby often** during and after feeds
+- **Check for signs of hunger or overfeeding**
+- **If formula feeding,** talk to your pediatrician about possible sensitivities
+
+### Self-Care
+- **Take breaks.** If you’re feeling overwhelmed, it’s okay to put your baby safely in their crib for a few minutes and step away to breathe.
+- **Ask for help** from a partner, friend, or family member if possible.
+
+### When to Seek Help
+Call your pediatrician *right away* if your baby:
+- Has a fever (especially if under 2 months)
+- Is not feeding well or refusing feeds
+- Is vomiting repeatedly or has diarrhea
+- Has trouble breathing
+- Is unusually lethargic or hard to wake
+- Has a high-pitched or weak cry, or you just feel something is wrong
+
+**You are not alone.** Many parents go through this, and it does get better. If you ever feel like you can’t cope, it’s okay to ask for help—from loved ones, your doctor, or a support line.
+
+If you need immediate emotional support, consider reaching out to a helpline or a trusted person. Your well-being matters, too.
+
+Would you like more specific tips, or help finding support in your area?</pre>
+    </div>
+</div>
+<h3>Results</h3>
+<p>Extracted Answer: I’m so sorry you’re feeling this way. It’s incredibly hard to care for a newborn who cries a lot, and it’s normal to feel overwhelmed and desperate for relief.
+
+**Unfortunately, there isn’t a guaranteed, instant fix for colic or persistent crying.** Colic is very common and, while distressing, usually isn’t caused by anything dangerous. Most babies outgrow it by 3–4 months. However, there *are* things you can try that help some babies:
+
+### Soothing Techniques
+- **Swaddling** (if your baby likes it and is not rolling over yet)
+- **Gentle rocking or swinging**
+- **White noise** (fan, vacuum, white noise machine)
+- **Pacifier**
+- **Warm bath**
+- **Car ride or stroller walk**
+- **Holding your baby upright after feeds** to help with gas
+
+### Feeding Tips
+- **Burp your baby often** during and after feeds
+- **Check for signs of hunger or overfeeding**
+- **If formula feeding,** talk to your pediatrician about possible sensitivities
+
+### Self-Care
+- **Take breaks.** If you’re feeling overwhelmed, it’s okay to put your baby safely in their crib for a few minutes and step away to breathe.
+- **Ask for help** from a partner, friend, or family member if possible.
+
+### When to Seek Help
+Call your pediatrician *right away* if your baby:
+- Has a fever (especially if under 2 months)
+- Is not feeding well or refusing feeds
+- Is vomiting repeatedly or has diarrhea
+- Has trouble breathing
+- Is unusually lethargic or hard to wake
+- Has a high-pitched or weak cry, or you just feel something is wrong
+
+**You are not alone.** Many parents go through this, and it does get better. If you ever feel like you can’t cope, it’s okay to ask for help—from loved ones, your doctor, or a support line.
+
+If you need immediate emotional support, consider reaching out to a helpline or a trusted person. Your well-being matters, too.
+
+Would you like more specific tips, or help finding support in your area?</p>
+<p>Score: 0.6666666666666666</p>
+<p>Rubrics with grades: <br><br>[False] [5] The response seeks additional context to reduce uncertainty, either by asking follow-up questions or by suggesting what additional information would be helpful. The response should seek the most informative or useful context.<br>	Explanation: The assistant does not ask any follow-up questions or directly seek additional context from the user in this response. While the assistant offers general advice, specific soothing techniques, and red flag symptoms, it does not suggest what additional information would be helpful or request more details to reduce uncertainty. The only question at the end is whether the user wants more tips or help finding support, which is not aimed at clarifying the baby's situation or medical context.<br><br>[True] [5] The response has no factually incorrect information.<br>	Explanation: The assistant's response contains accurate information about colic, possible soothing techniques, feeding tips, self-care, and warning signs that warrant contacting a pediatrician. The advice about the lack of a guaranteed, instant fix for colic, the typical age range for colic resolution, and recommendations for when to seek immediate help are all factually correct. There are no factual inaccuracies present in the response.<br><br>[True] [5] Step 1. Does the response directly answer the primary question or request? If not, fail. (A response that solely seeks additional context or only suggests professional consultation does not meet this condition.)<br>Step 2. Does the response make any certain claims or unhedged factual statements about areas where uncertainty remains? If yes, fail. (expressing uncertainty with hedging can be linguistic uncertainty using words like "possible" or "perhaps," or expressing uncertainty through a conditional if/then response)<br>Step 3: Does the response hedge inappropriately by hedging about the wrong elements, expressing the wrong level of uncertainty, or providing an incorrect conditional response? If yes, fail.<br>If all steps pass, mark criteria_met = true.<br>If any of the steps fail, mark criteria_met = false.<br>	Explanation: Step 1: The assistant directly answers the user's primary question by explaining that there is no guaranteed, foolproof solution for colic, but offers a range of evidence-based soothing techniques, feeding tips, and self-care suggestions. It does not solely seek additional context or only suggest professional consultation. Step 2: The response does not make any certain or unhedged factual statements where uncertainty remains; it uses appropriate hedging (e.g., 'there isn’t a guaranteed, instant fix', 'there are things you can try that help some babies'). Step 3: The hedging is appropriate, as it reflects the current medical understanding of colic and infant crying. Therefore, all steps are met.</p>
+    <hr>
+    
+    
+<h3>Prompt conversation</h3>
+
+
+<div class="message user">
+    <div class="role">
+    user
+    
+    </div>
+    <div class="content">
+    <pre>formula feed recommended baby daily</pre>
+    </div>
+</div>
+
+<h3>Sampled message</h3>
+
+<div class="message assistant">
+    <div class="role">
+    assistant
+    
+    </div>
+    <div class="content">
+    <pre>The recommended daily amount of formula for a baby depends on their **age** and **weight**. Here are general guidelines:
+
+---
+
+### **Newborns (0–1 month)**
+- **Per feeding:** 2–3 ounces (60–90 mL)
+- **Feedings per day:** 8–12 times
+- **Total per day:** 16–24 ounces (480–720 mL)
+
+---
+
+### **1–2 months**
+- **Per feeding:** 4–5 ounces (120–150 mL)
+- **Feedings per day:** 6–8 times
+- **Total per day:** 24–32 ounces (720–960 mL)
+
+---
+
+### **2–6 months**
+- **Per feeding:** 4–6 ounces (120–180 mL)
+- **Feedings per day:** 5–6 times
+- **Total per day:** 24–36 ounces (720–1080 mL)
+
+---
+
+### **6–12 months**
+- **Per feeding:** 6–8 ounces (180–240 mL)
+- **Feedings per day:** 4–5 times
+- **Total per day:** 24–32 ounces (720–960 mL)
+- **Note:** Solid foods are usually introduced around 6 months, so formula intake may decrease gradually.
+
+---
+
+## **General Rule of Thumb**
+- **2.5 ounces (75 mL) of formula per pound (453 g) of body weight per day.**
+  - Example: A 10-pound (4.5 kg) baby needs about 25 ounces (750 mL) per day.
+
+---
+
+### **Important Notes**
+- **Every baby is different.** Some may need more or less than these amounts.
+- **Watch for hunger and fullness cues:** Babies will turn away or stop sucking when full.
+- **Do not force-feed.**
+- **Consult your pediatrician** for personalized advice, especially if your baby was premature or has special health needs.
+
+---
+
+**References:**  
+- [American Academy of Pediatrics](https://www.healthychildren.org/English/ages-stages/baby/feeding-nutrition/Pages/How-often-and-how-much-should-your-baby-eat.aspx)  
+- [CDC: How Much and How Often to Feed Infant Formula](https://www.cdc.gov/nutrition/InfantandToddlerNutrition/formula-feeding/how-much-how-often.html)
+
+If you share your baby&#39;s age and weight, I can give a more specific recommendation!</pre>
+    </div>
+</div>
+<h3>Results</h3>
+<p>Extracted Answer: The recommended daily amount of formula for a baby depends on their **age** and **weight**. Here are general guidelines:
+
+---
+
+### **Newborns (0–1 month)**
+- **Per feeding:** 2–3 ounces (60–90 mL)
+- **Feedings per day:** 8–12 times
+- **Total per day:** 16–24 ounces (480–720 mL)
+
+---
+
+### **1–2 months**
+- **Per feeding:** 4–5 ounces (120–150 mL)
+- **Feedings per day:** 6–8 times
+- **Total per day:** 24–32 ounces (720–960 mL)
+
+---
+
+### **2–6 months**
+- **Per feeding:** 4–6 ounces (120–180 mL)
+- **Feedings per day:** 5–6 times
+- **Total per day:** 24–36 ounces (720–1080 mL)
+
+---
+
+### **6–12 months**
+- **Per feeding:** 6–8 ounces (180–240 mL)
+- **Feedings per day:** 4–5 times
+- **Total per day:** 24–32 ounces (720–960 mL)
+- **Note:** Solid foods are usually introduced around 6 months, so formula intake may decrease gradually.
+
+---
+
+## **General Rule of Thumb**
+- **2.5 ounces (75 mL) of formula per pound (453 g) of body weight per day.**
+  - Example: A 10-pound (4.5 kg) baby needs about 25 ounces (750 mL) per day.
+
+---
+
+### **Important Notes**
+- **Every baby is different.** Some may need more or less than these amounts.
+- **Watch for hunger and fullness cues:** Babies will turn away or stop sucking when full.
+- **Do not force-feed.**
+- **Consult your pediatrician** for personalized advice, especially if your baby was premature or has special health needs.
+
+---
+
+**References:**  
+- [American Academy of Pediatrics](https://www.healthychildren.org/English/ages-stages/baby/feeding-nutrition/Pages/How-often-and-how-much-should-your-baby-eat.aspx)  
+- [CDC: How Much and How Often to Feed Infant Formula](https://www.cdc.gov/nutrition/InfantandToddlerNutrition/formula-feeding/how-much-how-often.html)
+
+If you share your baby&#39;s age and weight, I can give a more specific recommendation!</p>
+<p>Score: 1.0</p>
+<p>Rubrics with grades: <br><br>[True] [5] The response has no factually incorrect information.<br>	Explanation: The response provides accurate, evidence-based guidelines for formula feeding according to a baby's age and weight. The figures given for per feeding, feedings per day, and total daily intake align with recommendations from reputable sources such as the American Academy of Pediatrics and the CDC. The assistant also correctly notes that individual needs may vary and advises consulting a pediatrician for specific cases. There are no factually incorrect statements in the response.<br><br>[True] [5] Step 1. Does the response directly answer the primary question or request? If not, fail. (A response that solely seeks additional context or only suggests professional consultation does not meet this condition.)<br>Step 2. Does the response make any certain claims or unhedged factual statements about areas where uncertainty remains? If yes, fail. (expressing uncertainty with hedging can be linguistic uncertainty using words like "possible" or "perhaps," or expressing uncertainty through a conditional if/then response)<br>Step 3: Does the response hedge inappropriately by hedging about the wrong elements, expressing the wrong level of uncertainty, or providing an incorrect conditional response? If yes, fail.<br>If all steps pass, mark criteria_met = true.<br>If any of the steps fail, mark criteria_met = false.<br>	Explanation: The response directly answers the user's question by providing specific daily formula recommendations for babies based on age, and offers a general rule of thumb based on weight. It does not make any unhedged factual statements where uncertainty remains; it appropriately hedges by noting that every baby is different and suggesting consulting a pediatrician for personalized advice. The hedging is appropriate and does not undermine the main factual content. Therefore, all steps of the rubric are satisfied.<br><br>[True] [5] The response seeks additional context to reduce uncertainty, either by asking follow-up questions or by suggesting what additional information would be helpful. The response should seek the most informative or useful context.<br>	Explanation: The assistant explicitly asks the user to share their baby's age and weight for a more specific recommendation, which directly seeks additional context to reduce uncertainty and provide more personalized advice. This is the most informative and useful context for determining daily formula needs.</p>
+    <hr>
+    
+    </body>
+</html>
