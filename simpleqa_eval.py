@@ -97,15 +97,39 @@ CHOICE_STRINGS = ["CORRECT", "INCORRECT", "NOT_ATTEMPTED"]
 CHOICE_LETTER_TO_STRING = dict(zip(CHOICE_LETTERS, CHOICE_STRINGS))
 
 class SimpleQAEval(Eval):
-    def __init__(self, grader_model: SamplerBase, num_examples: int | None = None, n_repeats: int = 1):
-        df = pandas.read_csv(
-            "https://openaipublic.blob.core.windows.net/simple-evals/simple_qa_test_set.csv"
-        )
-        examples = [row.to_dict() for _, row in df.iterrows()]
+    def __init__(
+        self,
+        grader_model: SamplerBase,
+        num_examples: int | None = None,
+        n_repeats: int = 1,
+        examples: list[dict] | None = None,
+    ):
+        """Create a SimpleQAEval.
+
+        Parameters
+        ----------
+        grader_model : SamplerBase
+            Model used to grade the predicted answers.
+        num_examples : int | None, optional
+            Number of examples to subsample from the dataset, by default None.
+        n_repeats : int, optional
+            Number of times to repeat the dataset, by default 1.
+        examples : list[dict] | None, optional
+            Custom examples in the form ``{"problem": str, "answer": str}``. If
+            not provided, the default SimpleQA dataset is loaded.
+        """
+
+        if examples is None:
+            df = pandas.read_csv(
+                "https://openaipublic.blob.core.windows.net/simple-evals/simple_qa_test_set.csv"
+            )
+            examples = [row.to_dict() for _, row in df.iterrows()]
+
         if num_examples:
             assert n_repeats == 1, "n_repeats only supported when max_examples = None"
             rng = random.Random(0)
             examples = rng.sample(examples, num_examples)
+
         self.examples = examples * n_repeats
         self.grader_model = grader_model
 

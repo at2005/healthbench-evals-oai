@@ -3,6 +3,13 @@ import os
 from pathlib import Path
 from flask import Flask, render_template, redirect, url_for, request, jsonify, abort
 
+from sampler.chat_completion_sampler import (
+    ChatCompletionSampler,
+    OPENAI_SYSTEM_MESSAGE_API,
+)
+from sampler.ai_sdk_sampler import AISDKSampler
+from healthbench_eval import HealthBenchEval
+
 app = Flask(__name__)
 
 # Path to the metadata directory
@@ -85,6 +92,52 @@ def api_category_scores(eval_id):
     
     category_scores = eval_data.get('category_scores', {})
     return jsonify(category_scores)
+
+
+@app.route('/api/healthbench_eval', methods=['POST'])
+def api_healthbench_eval():
+    """Run HealthBenchEval on a custom set of examples."""
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({"error": "Invalid JSON"}), 400
+
+    model_name = data.get('model')
+    examples = data.get('examples')
+    if not model_name or not isinstance(examples, list):
+        return jsonify({"error": "`model` and list of `examples` required"}), 400
+
+    # Convert rubric dicts to RubricItem objects
+    processed_examples = []
+    for ex in examples:
+        if not isinstance(ex, dict):
+            continue
+        prompt = ex.get('prompt')
+        rubrics = ex.get('rubrics')
+        if not isinstance(prompt, list) or not isinstance(rubrics, list):
+            continue
+        processed_examples.append({
+            'prompt': prompt,
+            'rubrics': rubrics,
+            'example_tags': ex.get('example_tags', []),
+        })
+
+    if not processed_examples:
+        return jsonify({"error": "No valid examples provided"}), 400
+
+    grading_sampler = ChatCompletionSampler(
+        model="gpt-4.1-2025-04-14",
+        system_message=OPENAI_SYSTEM_MESSAGE_API,
+        max_tokens=2048,
+    )
+    model_sampler = AISDKSampler(
+        model=model_name,
+        max_tokens=2048,
+    )
+
+    eval_obj = HealthBenchEval(grader_model=grading_sampler, examples=processed_examples)
+    result = eval_obj(model_sampler)
+
+    return jsonify({"score": result.score, "metrics": result.metrics})
 
 @app.route('/compare', methods=['GET', 'POST'])
 def compare_evaluations():
