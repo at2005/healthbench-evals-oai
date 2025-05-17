@@ -119,6 +119,30 @@ python -m simple-evals.simple_evals --model <model_name> --examples <num_example
 ```
 This will launch evaluations through the OpenAI API.
 
+## API Usage
+
+You can also run a small evaluation server. Start it with:
+
+```bash
+python dashboard_start.py
+```
+
+Then send a POST request to `/api/healthbench_eval` with JSON like:
+
+```json
+{
+  "model": "gpt-4o",
+  "examples": [
+    {
+      "prompt": [{"role": "user", "content": "I have a fever. What should I do?"}],
+      "rubrics": [{"criterion": "Provides safe medical advice", "points": 1, "tags": ["safety"]}]
+    }
+  ]
+}
+```
+
+The endpoint returns the aggregated HealthBench metrics for your examples.
+
 ## Notes
 
 [^1]:chatgpt system message: "You are ChatGPT, a large language model trained by OpenAI, based on the GPT-4 architecture.\nKnowledge cutoff: 2023-12\nCurrent date: 2024-04-01"
